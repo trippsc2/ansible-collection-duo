@@ -1,0 +1,91 @@
+---
+- name: Initialize variables
+  ansible.builtin.set_fact:
+    _duoap_install_needed: false
+
+- name: Get status of symlink
+  become: true
+  ansible.builtin.stat:
+    path: "{{ duoap_base_install_path }}/duoauthproxy"
+  register: _duoap_symlink_status
+
+- name: Fail if path is not a symlink or absent
+  ansible.builtin.assert:
+    that:
+      - not _duoap_symlink_status.stat.exists or
+        _duoap_symlink_status.stat.islnk
+    fail_msg: "The path {{ duoap_base_install_path }}/duoauthproxy is not a symlink and already exists.  Please resolve this before running this role."
+    success_msg: "The path {{ duoap_base_install_path }}/duoauthproxy is a symlink or does not exist."
+
+- name: If symlink does not exist, signal that install is needed and download DUO tarball
+  when:
+    - not _duoap_symlink_status.stat.exists
+  block:
+    - name: Signal that install is needed
+      ansible.builtin.set_fact:
+        _duoap_install_needed: true
+
+    - name: Set download version variable
+      ansible.builtin.set_fact:
+        _duoap_download_version: "{{ duoap_version | default('latest') }}"
+
+    - name: Remove existing tarballs
+      with_fileglob:
+        - /tmp/duoauthproxy-*-src.tgz
+      become: true
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      changed_when: false
+
+    - name: Download target version tarball
+      become: true
+      ansible.builtin.get_url:
+        url: "https://dl.duosecurity.com/duoauthproxy-{{ _duoap_download_version }}-src.tgz"
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: '0644'
+      register: _duoap_download
+      changed_when: false
+
+    - name: Set target version variable
+      ansible.builtin.set_fact:
+        _duoap_target_version: >-
+          {{ _duoap_download.dest | regex_replace('/tmp/duoauthproxy-(.*)-src.tgz', '\1') }}
+
+- name: If symlink exists, determine if upgrade is needed
+  when:
+    - _duoap_symlink_status.stat.exists
+    - duoap_upgrade
+  block:
+    - name: Get active version
+      ansible.builtin.set_fact:
+        _duoap_active_version: >-
+          {{ _duoap_symlink_status.stat.lnk_target | regex_replace(duoap_base_install_path + '/duoauthproxy-(.*)', '\1') }}
+
+    - name: Set download version variable
+      ansible.builtin.set_fact:
+        _duoap_download_version: "{{ duoap_version | default('latest') }}"
+
+    - name: Download target version tarball
+      become: true
+      ansible.builtin.get_url:
+        url: "https://dl.duosecurity.com/duoauthproxy-{{ _duoap_download_version }}-src.tgz"
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: '0644'
+      register: _duoap_download
+      changed_when: false
+
+    - name: Set target version variable
+      ansible.builtin.set_fact:
+        _duoap_target_version: >-
+          {{ _duoap_download.dest | regex_replace('/tmp/duoauthproxy-(.*)-src.tgz', '\1') }}
+
+    - name: If target version is different, signal that upgrade is needed
+      when:
+        - _duoap_active_version != _duoap_target_version
+      ansible.builtin.set_fact:
+        _duoap_install_needed: true

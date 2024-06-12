@@ -1,0 +1,13 @@
+{{ ansible_managed | comment }}
+
+{{ duoap_log_dir }}/*.log {
+    {{ duoap_logrotate_period }}
+    copytruncate
+    rotate {{ duoap_logrotate_retention }}
+    dateext
+    compress
+    delaycompress
+    postrotate
+        /bin/systemctl reload duoauthproxy 2> /dev/null || true
+    endscript
+}

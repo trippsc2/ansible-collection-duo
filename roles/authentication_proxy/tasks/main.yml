@@ -1,0 +1,25 @@
+---
+- name: Validate
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Include OS variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install dependencies
+  ansible.builtin.import_tasks: prepare.yml
+
+- name: Install Duo Authentication Proxy
+  ansible.builtin.import_tasks: install/main.yml
+
+- name: Configure Duo Authentication Proxy
+  ansible.builtin.import_tasks: configure.yml
+
+- name: Configure firewalld
+  when:
+    - duoap_configure_firewalld
+  ansible.builtin.include_tasks: firewalld.yml
+
+- name: Configure ufw
+  when:
+    - duoap_configure_ufw
+  ansible.builtin.include_tasks: ufw.yml

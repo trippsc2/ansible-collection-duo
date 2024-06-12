@@ -1,0 +1,17 @@
+---
+_duoap_default_configure_selinux: false
+_duoap_default_configure_firewalld: "{{ ansible_distribution == 'Debian' }}"
+_duoap_default_configure_ufw: "{{ ansible_distribution != 'Debian' }}"
+
+_duoap_packages:
+  - build-essential
+  - libssl-dev
+  - libffi-dev
+  - python3-pip
+  - tar
+
+_duoap_selinux_packages:
+  - selinux-policy-devel
+  - chkconfig
+
+_duoap_default_http_ca_certs_file: /etc/ssl/certs/ca-certificates.crt

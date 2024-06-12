@@ -1,0 +1,26 @@
+---
+- name: Prepare to install
+  ansible.builtin.import_tasks: prepare.yml
+
+- name: Install
+  when:
+    - _duoap_install_needed
+  ansible.builtin.include_tasks: install.yml
+
+- name: Cleanup tarball downloads
+  with_fileglob:
+    - /tmp/duoauthproxy-*-src.tgz
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  changed_when: false
+  failed_when: false
+
+- name: Cleanup build directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ duoap_temp_path }}"
+    state: absent
+  changed_when: false
+  failed_when: false

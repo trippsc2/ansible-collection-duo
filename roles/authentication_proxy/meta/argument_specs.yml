@@ -1,0 +1,731 @@
+---
+argument_specs:
+  main:
+    short_description: DUO Authentication Proxy
+    description:
+      - This role installs and configures the DUO Authentication Proxy.
+    author: Jim Tarpley
+    options:
+      duoap_configure_selinux:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether the role will configure SELinux for the DUO Authentication Proxy.
+      duoap_group:
+        type: str
+        required: false
+        default: duo_authproxy_svc
+        description:
+          - The primary group of the `duoap_user` user under which the DUO Authentication Proxy will run.
+      duoap_user:
+        type: str
+        required: false
+        default: duo_authproxy_svc
+        description:
+          - The user account as which the DUO Authentication Proxy will run.
+      duoap_combine_certs:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description:
+          - A list of dictionaries specifying the certificates to combine and the path to which they will be written.
+        options:
+          files:
+            type: list
+            elements: path
+            required: true
+            description:
+              - A list of certificate files to combine.
+          path:
+            type: path
+            required: true
+            description:
+              - The path to which the combined certificate will be written.
+      duoap_base_install_path:
+        type: path
+        required: false
+        default: /opt
+        description:
+          - The base path where the DUO Authentication Proxy will be installed.
+          - The installed version will be placed at `./duoauthproxy-<version>` relative to this path.
+          - A symlink will be created at `./duoauthproxy` pointing to the most recently installed version.
+      duoap_version:
+        type: str
+        required: false
+        description:
+          - The version of the DUO Authentication Proxy to install.
+          - If not specified, the latest version will be installed.
+          - If another version is already installed and `duoap_upgrade` is set to `false`, the role will not upgrade/downgrade to this version. 
+      duoap_upgrade:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether the role will upgrade/downgrade the DUO Authentication Proxy to the specified version, if it is not already installed.
+      duoap_temp_path:
+        type: path
+        required: false
+        default: /tmp/duoap
+        description:
+          - The path where temporary files will be stored during the installation process.
+      duoap_cleanup_old_version:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether the role will remove old versions of the DUO Authentication Proxy after upgrading/downgrading.
+      duoap_log_dir:
+        type: path
+        required: false
+        default: /var/log/duo
+        description:
+          - The directory where DUO Authentication Proxy logs will be stored.
+      duoap_configure_logrotate:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether the role will configure logrotate for the DUO Authentication Proxy.
+      duoap_debug:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether DUO Authentication Proxy will run in debug mode.
+      duoap_log_auth_events:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether DUO Authentication Proxy will log authentication events.
+      duoap_log_sso_events:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether DUO Authentication Proxy will log SSO events.
+      duoap_log_max_files:
+        type: int
+        required: false
+        default: 6
+        description:
+          - The maximum number of log files to keep.
+          - If `duoap_configure_logrotate` is `true`, this will default to 0.
+      duoap_log_max_size_in_mb:
+        type: int
+        required: false
+        default: 10
+        description:
+          - The maximum size of each log file in megabytes.
+          - If `duoap_configure_logrotate` is `true`, this will default to 0.
+      duoap_http_ca_certs_file:
+        type: path
+        required: false
+        default: OS specific
+        description:
+          - The path to a file containing CA certificates to trust when making HTTP requests.
+          - If not specified, the role will use the system default.
+      duoap_interface:
+        type: str
+        required: false
+        description:
+          - The network interface on which the DUO Authentication Proxy will listen.
+      duoap_http_proxy_host:
+        type: str
+        required: false
+        description:
+          - The hostname of the HTTP proxy server.
+      duoap_http_proxy_port:
+        type: int
+        required: false
+        description:
+          - The port of the HTTP proxy server.
+      duoap_test_connectivity_on_startup:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether the DUO Authentication Proxy will test connectivity to the DUO API server on startup.
+      duoap_service_account_username:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The username of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory.
+      duoap_service_account_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory.
+      duoap_ikey:
+        type: str
+        required: false
+        description:
+          - The integration key for the DUO Authentication Proxy.
+      duoap_skey:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The secret key for the DUO Authentication Proxy.
+      duoap_api_host:
+        type: str
+        required: false
+        description:
+          - The FQDN of the DUO API server.
+      duoap_ad_clients:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description:
+          - A list of dictionaries specifying Active Directory clients.
+        options:
+          comment:
+            type: str
+            required: false
+            description:
+              - A comment with which to mark the AD client.
+          hosts:
+            type: list
+            elements: str
+            required: true
+            description:
+              - A list of hostnames or IP addresses to which to connect.
+          service_account_username:
+            type: str
+            required: false
+            description:
+              - The username of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory.
+              - The `duoap_service_account_username` variable will be used if not specified.
+          service_account_password:
+            type: str
+            required: false
+            no_log: true
+            description:
+              - The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory.
+              - The `duoap_service_account_password` variable will be used if not specified.
+          search_dn:
+            type: str
+            required: true
+            description:
+              - The distinguished name of the search base.
+          security_group_dn:
+            type: str
+            required: false
+            description:
+              - The distinguished name of the security group of which membership is required to login.
+              - If not specified, no security group will be required.
+          ldap_filter:
+            type: str
+            required: false
+            description:
+              - An LDAP filter that the users must match to login.
+          transport:
+            type: str
+            choices:
+              - clear
+              - ldaps
+              - starttls
+            required: false
+            description:
+              - The transport protocol to use.
+          timeout:
+            type: int
+            required: false
+            description:
+              - The timeout in seconds for the connection before failing over to the next host.
+          ssl_ca_certs_file:
+            type: path
+            required: false
+            description:
+              - The path to a file containing CA certificates to trust when making SSL connections.
+              - If not specified, the role will use the system default.
+          ssl_verify_hostname:
+            type: bool
+            required: false
+            default: true
+            description:
+              - Whether to verify the hostname of the SSL certificate.
+          auth_type:
+            type: str
+            choices:
+              - ntlm2
+              - plain
+            required: false
+            description:
+              - The authentication type to use.
+              - If not specified, the role will use `ntlm2`.
+          bind_dn:
+            type: str
+            required: false
+            description:
+              - The distinguished name of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory.
+          ntlm_domain:
+            type: str
+            required: false
+            description:
+              - The domain to use for NTLM authentication.
+          ntlm_workstation:
+            type: str
+            required: false
+            description:
+              - The workstation to use for NTLM authentication.
+          port:
+            type: int
+            required: false
+            description:
+              - The port on which to connect.
+          username_attribute:
+            type: str
+            required: false
+            description:
+              - The attribute to use as the username.
+              - If not specified, the role will use `sAMAccountName`.
+          at_attribute:
+            type: str
+            required: false
+            description:
+              - The attribute to use to match usernames with `@` symbol.
+              - If not specified, the role will use `userPrincipalName`.
+      duoap_radius_clients:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description:
+          - A list of dictionaries specifying RADIUS clients.
+        options:
+          comment:
+            type: str
+            required: false
+            description:
+              - A comment with which to mark the RADIUS client.
+          hosts:
+            type: list
+            elements: str
+            required: true
+            description:
+              - A list of hostnames or IP addresses to which to connect.
+          secret:
+            type: str
+            required: true
+            no_log: true
+            description:
+              - The shared secret to use for authentication.
+          ports:
+            type: list
+            elements: int
+            required: true
+            description:
+              - A list of ports on which to connect.
+          retries:
+            type: int
+            required: false
+            description:
+              - The number of times to retry connecting to the RADIUS server.
+          retry_wait:
+            type: int
+            required: false
+            description:
+              - The number of seconds to wait between retries.
+          nas_ip:
+            type: str
+            required: false
+            description:
+              - The IP address of the NAS.
+          pass_through_attr_names:
+            type: list
+            elements: str
+            required: false
+            description:
+              - A list of attributes to pass through to the RADIUS server.
+          pw_codec:
+            type: str
+            required: false
+            description:
+              - The codec to use for the password.
+      duoap_duo_only_client_enabled:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether the DUO Authentication Proxy will only allow DUO authentication.
+      duoap_ldap_auto_servers:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description:
+          - A list of dictionaries specifying LDAP auto servers.
+        options:
+          comment:
+            type: str
+            required: false
+            description:
+              - A comment with which to mark the LDAP auto server.
+          ikey:
+            type: str
+            required: true
+            description:
+              - The integration key for the DUO Authentication Proxy.
+          skey:
+            type: str
+            required: true
+            no_log: true
+            description:
+              - The secret key for the DUO Authentication Proxy.
+          api_host:
+            type: str
+            required: true
+            description:
+              - The FQDN of the DUO API server.
+          client:
+            type: str
+            required: true
+            description:
+              - The client ID for the DUO Authentication Proxy.
+          factors:
+            type: list
+            elements: str
+            choices:
+              - auto
+              - push
+              - phone
+              - passcode
+            required: false
+            description:
+              - A list of factors to use for authentication.
+          failmode:
+            type: str
+            choices:
+              - safe
+              - secure
+            required: false
+            description:
+              - The failmode to use for authentication.
+          port:
+            type: int
+            required: false
+            description:
+              - The port on which to listen for LDAP.
+          interface:
+            type: str
+            required: false
+            description:
+              - The network interface on which to listen for LDAP.
+          api_timeout:
+            type: int
+            required: false
+            description:
+              - The timeout in seconds for the API connection.
+              - If not specified, there is no timeout.
+          network_timeout:
+            type: int
+            required: false
+            description:
+              - The timeout in seconds for the network connection.
+              - If not specified, the role will default to 10 minutes (600).
+          idle_timeout:
+            type: int
+            required: false
+            description:
+              - The timeout in seconds for the idle connection.
+              - If not specified, the role will default to 1 hour (3600).
+          ssl_port:
+            type: int
+            required: false
+            description:
+              - The port on which to listen for SSL.
+          ssl_key_path:
+            type: path
+            required: false
+            description:
+              - The path to the SSL key file.
+          ssl_cert_path:
+            type: path
+            required: false
+            description:
+              - The path to the SSL certificate file.
+          exempt_primary_bind:
+            type: bool
+            required: false
+            description:
+              - Whether to exempt the primary bind from DUO authentication.
+          exempt_ous:
+            type: list
+            elements: str
+            required: false
+            description:
+              - A list of OUs to exempt from DUO authentication.
+          delimiter:
+            type: str
+            required: false
+            description:
+              - The delimiter to separate the password and the passcode in the password field.
+              - If not specified, the role will default to `,`.
+          delimiter_password_length:
+            type: int
+            required: false
+            description:
+              - The length of the password in the password field.
+              - All characters after this length will be considered the passcode.
+          allow_concat:
+            type: bool
+            required: false
+            description:
+              - Whether to allow concatenation of the password and passcode.
+          allow_searches_after_bind:
+            type: bool
+            required: false
+            description:
+              - Whether to allow searches after the primary bind.
+          allow_unlimited_binds:
+            type: bool
+            required: false
+            description:
+              - Whether to allow unlimited binds.
+          minimum_tls_version:
+            type: str
+            required: false
+            choices:
+              - ssl3
+              - tls1.0
+              - tls1.1
+              - tls1.2
+            description:
+              - The minimum TLS version to accept.
+          cipher_list:
+            type: str
+            required: false
+            description:
+              - The list of ciphers to accept.
+              - These are in OpenSSL format. https://www.openssl.org/docs/man1.1.1/man1/ciphers.html#CIPHER-LIST-FORMAT
+      duoap_radius_auto_servers:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description:
+          - A list of dictionaries specifying RADIUS auto servers.
+        options:
+          comment:
+            type: str
+            required: false
+            description:
+              - A comment with which to mark the RADIUS auto server.
+          ikey:
+            type: str
+            required: true
+            description:
+              - The integration key for the DUO Authentication Proxy.
+          skey:
+            type: str
+            required: true
+            no_log: true
+            description:
+              - The secret key for the DUO Authentication Proxy.
+          api_host:
+            type: str
+            required: true
+            description:
+              - The FQDN of the DUO API server.
+          client:
+            type: str
+            required: true
+            description:
+              - The client ID for the DUO Authentication Proxy.
+          radius_clients:
+            type: list
+            elements: dict
+            required: true
+            description:
+              - A list of RADIUS clients to use.
+            options:
+              ip:
+                type: str
+                required: true
+                description:
+                  - The IP address of the RADIUS client.
+              secret:
+                type: str
+                required: true
+                no_log: true
+                description:
+                  - The shared secret to use for authentication.
+          factors:
+            type: list
+            elements: str
+            choices:
+              - auto
+              - push
+              - phone
+              - passcode
+            required: false
+            description:
+              - A list of factors to use for authentication.
+          delimiter:
+            type: str
+            required: false
+            description:
+              - The delimiter to separate the password and the passcode in the password field.
+              - If not specified, the role will default to `,`.
+          delimiter_password_length:
+            type: int
+            required: false
+            description:
+              - The length of the password in the password field.
+              - All characters after this length will be considered the passcode.
+          allow_concat:
+            type: bool
+            required: false
+            description:
+              - Whether to allow concatenation of the password and passcode.
+          api_timeout:
+            type: int
+            required: false
+            description:
+              - The timeout in seconds for the API connection.
+              - If not specified, there is no timeout.
+          failmode:
+            type: str
+            choices:
+              - safe
+              - secure
+            required: false
+            description:
+              - The failmode to use for authentication.
+          port:
+            type: int
+            required: false
+            description:
+              - The port on which to listen for LDAP.
+          interface:
+            type: str
+            required: false
+            description:
+              - The network interface on which to listen for LDAP.
+          pass_through_attr_names:
+            type: list
+            elements: str
+            required: false
+            description:
+              - A list of attributes to pass through to the RADIUS server.
+          pass_through_all:
+            type: bool
+            required: false
+            description:
+              - Whether to pass through all attributes to the RADIUS server.
+          client_ip_attr:
+            type: str
+            required: false
+            description:
+              - The attribute to use for the client IP address.
+          exempt_usernames:
+            type: list
+            elements: str
+            required: false
+            description:
+              - A list of usernames to exempt from DUO authentication.
+          pw_codec:
+            type: str
+            required: false
+            description:
+              - The codec to use for the password.
+      duoap_configure_dirsync:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether the role will configure directory synchronization.
+      duoap_dirsync_ikey:
+        type: str
+        required: false
+        description:
+          - The integration key for directory synchronization.
+          - If not specified, the role will use the `duoap_ikey` variable.
+      duoap_dirsync_skey:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The secret key for directory synchronization.
+          - If not specified, the role will use the `duoap_skey` variable.
+      duoap_dirsync_api_host:
+        type: str
+        required: false
+        description:
+          - The FQDN of the DUO API server for directory synchronization.
+          - If not specified, the role will use the `duoap_api_host` variable.
+      duoap_dirsync_service_account_username:
+        type: str
+        required: false
+        description:
+          - The username of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory for directory synchronization.
+          - If not specified, the role will use the `duoap_service_account_username` variable.
+      duoap_dirsync_service_account_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory for directory synchronization.
+          - If not specified, the role will use the `duoap_service_account_password` variable.
+      duoap_configure_sso:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether the role will configure SSO.
+      duoap_rikey:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The integration key for SSO.
+          - If `duoap_configure_sso` is `true`, this variable is required.
+      duoap_sso_service_account_username:
+        type: str
+        required: false
+        description:
+          - The username of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory for SSO.
+          - If not specified, the role will use the `duoap_service_account_username` variable.
+      duoap_sso_service_account_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory for SSO.
+          - If not specified, the role will use the `duoap_service_account_password` variable.
+      duoap_logrotate_period:
+        type: str
+        required: false
+        choices:
+          - daily
+          - weekly
+          - monthly
+        default: daily
+        description:
+          - The period for log rotation.
+      duoap_logrotate_retention:
+        type: int
+        required: false
+        default: 7
+        description:
+          - The number of log files to retain.
+      duoap_configure_firewalld:
+        type: bool
+        required: false
+        default: OS specific
+        description:
+          - Whether the role will configure firewalld.
+          - If Red Hat based or Debian, this will default to `true`.
+      duoap_configure_ufw:
+        type: bool
+        required: false
+        default: OS specific
+        description:
+          - Whether the role will configure ufw.
+          - If Ubuntu based, this will default to `true`.

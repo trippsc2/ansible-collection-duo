@@ -1,0 +1,46 @@
+---
+- name: Ensure log directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ duoap_log_dir }}"
+    state: directory
+    owner: "{{ duoap_user }}"
+    group: "{{ duoap_group }}"
+    mode: '0755'
+
+- name: Configure Duo Authentication Proxy
+  become: true
+  ansible.builtin.template:
+    src: authproxy.cfg.j2
+    dest: "{{ duoap_base_install_path }}/duoauthproxy/conf/authproxy.cfg"
+    owner: "{{ duoap_user }}"
+    group: "{{ duoap_group }}"
+    mode: '0400'
+  notify:
+    - _duoap_restart_duoap
+
+- name: Ensure Duo Authentication Proxy systemd service is enabled
+  become: true
+  ansible.builtin.systemd_service:
+    name: duoauthproxy.service
+    enabled: true
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure Duo Authentication Proxy systemd service is started
+  become: true
+  ansible.builtin.systemd_service:
+    name: duoauthproxy.service
+    state: started
+
+- name: Configure logrotate
+  when:
+    - duoap_configure_logrotate
+  become: true
+  ansible.builtin.template:
+    src: duoauthproxy.logrotate.j2
+    dest: /etc/logrotate.d/duoauthproxy
+    owner: root
+    group: root
+    mode: '0644'

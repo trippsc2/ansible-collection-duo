@@ -1,0 +1,83 @@
+---
+- name: Ensure temp directory is created
+  become: true
+  ansible.builtin.file:
+    path: "{{ duoap_temp_path }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Extract Duo Authentication Proxy tarball
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/duoauthproxy-{{ _duoap_target_version }}-src.tgz"
+    dest: "{{ duoap_temp_path }}"
+    remote_src: true
+    list_files: true
+  register: _duoap_unarchive
+
+- name: Run Duo Authentication Proxy make file
+  become: true
+  community.general.make:
+    chdir: "{{ duoap_temp_path }}/{{ _duoap_unarchive.files[0] }}"
+    make: /usr/bin/make
+
+- name: Run Duo Authentication Proxy install script
+  become: true
+  ansible.builtin.command: |
+    {{ duoap_temp_path }}/{{ _duoap_unarchive.files[0] }}duoauthproxy-build/install --install-dir {{ duoap_base_install_path }}/duoauthproxy-{{ _duoap_target_version }} --service-user {{ duoap_user }} --log-group {{ duoap_group }} --create-init-script yes --enable-selinux={{ duoap_configure_selinux | ternary('yes', 'no') }}
+  changed_when: true
+  
+- name: Create Duo systemd service
+  become: true
+  ansible.builtin.template:
+    src: duoauthproxy.service.j2
+    dest: /etc/systemd/system/duoauthproxy.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - _duoap_systemd_reload
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Stop Duo Authentication Proxy service
+  become: true
+  ansible.builtin.systemd_service:
+    name: duoauthproxy.service
+    state: stopped
+
+- name: Create or update symlink
+  become: true
+  ansible.builtin.file:
+    src: "{{ duoap_base_install_path }}/duoauthproxy-{{ _duoap_target_version }}"
+    dest: "{{ duoap_base_install_path }}/duoauthproxy"
+    state: link
+    force: true
+
+- name: Cleanup old versions
+  when:
+    - duoap_cleanup_old_versions
+  become: true
+  block:
+    - name: Get old version directories
+      ansible.builtin.find:
+        paths:
+          - "{{ duoap_base_install_path }}"
+        patterns:
+          - "duoauthproxy-*"
+        file_type: directory
+        recurse: false
+        excludes:
+          - "duoauthproxy-{{ _duoap_target_version }}"
+      register: _duoap_old_versions
+
+    - name: Cleanup old versions
+      loop: "{{ _duoap_old_versions.files }}"
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop_control:
+        label: "{{ item.path }}"

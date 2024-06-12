@@ -1,0 +1,11 @@
+---
+_duoap_supported_os_families:
+  - Debian
+  - RedHat
+
+_duoap_radius_enabled: "{{ duoap_radius_auto_servers | length > 0 }}"
+
+_duoap_log_max_size: "{{ duoap_log_max_size_in_mb | int * 1024 * 1024 }}"
+
+_duoap_default_log_max_size: "{{ 0 if duoap_configure_logrotate else 10 }}"
+_duoap_default_log_max_files: "{{ 0 if duoap_configure_logrotate else 4 }}"

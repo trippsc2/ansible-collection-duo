@@ -1,0 +1,40 @@
+---
+duoap_configure_selinux: "{{ _duoap_default_configure_selinux | default(false) }}"
+
+duoap_group: duo_authproxy_grp
+duoap_user: duo_authproxy_svc
+
+duoap_combine_certs: []
+
+duoap_base_install_path: /opt
+
+duoap_upgrade: false
+
+duoap_temp_path: /tmp/duoap
+
+duoap_cleanup_old_versions: false
+
+duoap_http_ca_certs_file: "{{ _duoap_default_http_ca_certs_file | default(omit) }}"
+
+duoap_log_dir: /var/log/duo
+
+duoap_configure_logrotate: true
+
+duoap_log_max_size_in_mb: "{{ _duoap_default_log_max_size }}"
+duoap_log_max_files: "{{ _duoap_default_log_max_files }}"
+
+duoap_ad_clients: []
+duoap_radius_clients: []
+duoap_duo_only_client_enabled: false
+duoap_ldap_auto_servers: []
+duoap_radius_auto_servers: []
+duoap_radius_iframe_servers: []
+
+duoap_configure_dirsync: false
+duoap_configure_sso: false
+
+duoap_logrotate_period: daily
+duoap_logrotate_retention: 7
+
+duoap_configure_firewalld: "{{ _duoap_default_configure_firewalld | default(false) }}"
+duoap_configure_ufw: "{{ _duoap_default_configure_ufw | default(false) }}"

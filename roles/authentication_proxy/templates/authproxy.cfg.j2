@@ -1,0 +1,306 @@
+{{ ansible_managed | comment }}
+
+[main]
+{% if duoap_debug is defined %}
+debug={{ duoap_debug | ternary('true', 'false') }}
+{% endif %}
+log_dir={{ duoap_log_dir }}
+{% if duoap_log_auth_events is defined %}
+log_auth_events={{ duoap_log_auth_events | ternary('true', 'false') }}
+{% endif %}
+{% if duoap_log_sso_events is defined %}
+log_sso_events={{ duoap_log_sso_events | ternary('true', 'false') }}
+{% endif %}
+{% if duoap_log_file | default(true) %}
+log_max_files={{ duoap_log_max_files }}
+log_max_size={{ _duoap_log_max_size }}
+{% endif %}
+{% if duoap_log_file is defined %}
+log_file={{ duoap_log_file | ternary('true', 'false') }}
+{% endif %}
+{% if duoap_log_stdout is defined %}
+log_stdout={{ duoap_log_stdout | ternary('true', 'false') }}
+{% endif %}
+{% if duoap_log_syslog is defined %}
+log_syslog={{ duoap_log_syslog }}
+{% endif %}
+{% if duoap_log_syslog | default(false) %}
+{% if duoap_syslog_facility is defined %}
+syslog_facility={{ duoap_syslog_facility }}
+{% endif %}
+{% endif %}
+http_ca_certs_file={{ duoap_http_ca_certs_file }}
+{% if duoap_interface is defined %}
+interface={{ duoap_interface }}
+{% endif %}
+{% if duoap_http_proxy_host is defined %}
+http_proxy_host={{ duoap_http_proxy_host }}
+{% endif %}
+{% if duoap_http_proxy_port is defined %}
+http_proxy_port={{ duoap_http_proxy_port }}
+{% endif %}
+{% if duoap_test_connectivity_on_startup is defined %}
+test_connectivity_on_startup={{ duoap_test_connectivity_on_startup | ternary('true', 'false') }}
+{% endif %}
+{% if duoap_fips_mode is defined %}
+fips_mode={{ duoap_fips_mode | ternary('true', 'false') }}
+{% endif %}
+
+{% for client in duoap_ad_clients %}
+{% if client.comment is defined %}
+# {{ client.comment }}
+{% endif %}
+{% if loop.first %}
+[ad_client]
+{% else %}
+[ad_client{{ loop.index }}]
+{% endif %}
+{% for host in client.hosts %}
+{% if loop.first %}
+host={{ host }}
+{% else %}
+host_{{ loop.index }}={{ host }}
+{% endif %}
+{% endfor %}
+service_account_username={{ client.service_account_username | default(duoap_service_account_username) }}
+service_account_password={{ client.service_account_password | default(duoap_service_account_password) }}
+search_dn={{ client.search_dn }}
+{% if client.security_group_dn is defined %}
+security_group_dn={{ client.security_group_dn }}
+{% endif %}
+{% if client.ldap_filter is defined %}
+ldap_filter={{ client.ldap_filter }}
+{% endif %}
+{% if client.transport is defined %}
+transport={{ client.transport }}
+{% endif %}
+{% if client.timeout is defined %}
+timeout={{ client.timeout }}
+{% endif %}
+ssl_ca_certs_file={{ client.ssl_ca_certs_file | default(duoap_http_ca_certs_file) }}
+{% if client.ssl_verify_hostname is defined %}
+ssl_verify_hostname={{ client.ssl_verify_hostname | ternary('true', 'false') }}
+{% endif %}
+{% if client.auth_type is defined %}
+auth_type={{ client.auth_type }}
+{% endif %}
+{% if client.bind_dn is defined %}
+bind_dn={{ client.bind_dn }}
+{% endif %}
+{% if client.ntlm_domain is defined %}
+ntlm_domain={{ client.ntlm_domain }}
+{% endif %}
+{% if client.ntlm_workstation is defined %}
+ntlm_workstation={{ client.ntlm_workstation }}
+{% endif %}
+{% if client.port is defined %}
+port={{ client.port }}
+{% endif %}
+{% if client.username_attribute is defined %}
+username_attribute={{ client.username_attribute }}
+{% endif %}
+{% if client.at_attribute is defined %}
+at_attribute={{ client.at_attribute }}
+{% endif %}
+
+{% endfor %}
+{% for client in duoap_radius_clients %}
+{% if client.comment is defined %}
+# {{ client.comment }}
+{% endif %}
+{% if loop.first %}
+[radius_client]
+{% else %}
+[radius_client{{ loop.index }}]
+{% endif %}
+{% for host in client.hosts %}
+{% if loop.first %}
+host={{ host }}
+{% else %}
+host_{{ loop.index }}={{ host }}
+{% endif %}
+{% endfor %}
+secret={{ client.secret }}
+{% if client.ports is defined %}
+{% for port in client.ports %}
+{% if loop.first %}
+port={{ port }}
+{% else %}
+port_{{ loop.index }}={{ port }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if client.retries is defined %}
+retries={{ client.retries }}
+{% endif %}
+{% if client.retry_wait is defined %}
+retry_wait={{ client.retry_wait }}
+{% endif %}
+{% if client.nas_ip is defined %}
+nas_ip={{ client.nas_ip }}
+{% endif %}
+{% if client.pass_through_attr_names is defined %}
+pass_through_attr_names={{ client.pass_through_attr_names | join(',') }}
+{% endif %}
+{% if client.pass_through_all is defined %}
+pass_through_all={{ client.pass_through_all | ternary('true', 'false') }}
+{% endif %}
+{% if client.pw_codec is defined %}
+pw_codec={{ client.pw_codec }}
+{% endif %}
+
+{% endfor %}
+{% if duoap_duo_only_client_enabled %}
+[duo_only_client]
+
+{% endif %}
+{% for server in duoap_ldap_auto_servers %}
+{% if server.comment is defined %}
+# {{ server.comment }}
+{% endif %}
+{% if loop.first %}
+[ldap_server_auto]
+{% else %}
+[ldap_server_auto{{ loop.index }}]
+{% endif %}
+ikey={{ server.ikey }}
+skey={{ server.skey }}
+api_host={{ server.api_host }}
+client={{ server.client }}
+{% if server.factors is defined %}
+factors={{ server.factors | join(',') }}
+{% endif %}
+{% if server.failmode is defined %}
+failmode={{ server.failmode }}
+{% endif %}
+{% if server.port is defined %}
+port={{ server.port }}
+{% endif %}
+{% if server.interface is defined %}
+interface={{ server.interface }}
+{% endif %}
+{% if server.api_timeout is defined %}
+api_timeout={{ server.api_timeout }}
+{% endif %}
+{% if server.network_timeout is defined %}
+network_timeout={{ server.network_timeout }}
+{% endif %}
+{% if server.idle_timeout is defined %}
+idle_timeout={{ server.idle_timeout }}
+{% endif %}
+{% if server.ssl_port is defined %}
+ssl_port={{ server.ssl_port }}
+{% endif %}
+{% if server.ssl_key_path is defined %}
+ssl_key_path={{ server.ssl_key_path }}
+{% endif %}
+{% if server.ssl_cert_path is defined %}
+ssl_cert_path={{ server.ssl_cert_path }}
+{% endif %}
+{% if server.exempt_primary_bind is defined %}
+exempt_primary_bind={{ server.exempt_primary_bind }}
+{% endif %}
+{% if server.exempt_ous is defined %}
+{% for ou in server.exempt_ous %}
+exempt_ou_{{ loop.index }}={{ ou }}
+{% endfor %}
+{% endif %}
+{% if server.delimiter is defined %}
+delimiter={{ server.delimiter }}
+{% endif %}
+{% if server.delimited_password_length is defined %}
+delimited_password_length={{ server.delimited_password_length }}
+{% endif %}
+{% if server.allow_concat is defined %}
+allow_concat={{ server.allow_concat | ternary('true', 'false') }}
+{% endif %}
+{% if server.allow_searches_after_bind is defined %}
+allow_searches_after_bind={{ server.allow_searches_after_bind  | ternary('true', 'false') }}
+{% endif %}
+{% if server.allow_unlimited_binds is defined %}
+allow_unlimited_binds={{ server.allow_unlimited_binds | ternary('true', 'false') }}
+{% endif %}
+{% if server.minimum_tls_version is defined %}
+minimum_tls_version={{ server.minimum_tls_version }}
+{% endif %}
+{% if server.cipher_list is defined %}
+cipher_list={{ server.cipher_list }}
+{% endif %}
+
+{% endfor %}
+{% for server in duoap_radius_auto_servers %}
+{% if server.comment is defined %}
+# {{ server.comment }}
+{% endif %}
+{% if loop.first %}
+[radius_server_auto]
+{% else %}
+[radius_server_auto{{ loop.index }}]
+{% endif %}
+ikey={{ server.ikey }}
+skey={{ server.skey }}
+api_host={{ server.api_host }}
+client={{ server.client }}
+{% for client in server.radius_clients %}
+radius_ip_{{ loop.index }}={{ client.ip }}
+radius_secret_{{ loop.index }}={{ client.secret }}
+{% endfor %}
+{% if server.factors is defined %}
+factors={{ server.factors | join(',') }}
+{% endif %}
+{% if server.delimiter is defined %}
+delimiter={{ server.delimiter }}
+{% endif %}
+{% if server.delimited_password_length is defined %}
+delimited_password_length={{ server.delimited_password_length }}
+{% endif %}
+{% if server.allow_concat is defined %}
+allow_concat={{ server.allow_concat | ternary('true', 'false') }}
+{% endif %}
+{% if server.api_timeout is defined %}
+api_timeout={{ server.api_timeout }}
+{% endif %}
+{% if server.failmode is defined %}
+failmode={{ server.failmode }}
+{% endif %}
+{% if server.port is defined %}
+port={{ server.port }}
+{% endif %}
+{% if server.interface is defined %}
+interface={{ server.interface }}
+{% endif %}
+{% if server.pass_through_attr_names is defined %}
+pass_through_attr_names={{ server.pass_through_attr_names | join(',') }}
+{% endif %}
+{% if server.pass_through_all is defined %}
+pass_through_all={{ server.pass_through_all | ternary('true', 'false') }}
+{% endif %}
+{% if server.client_ip_attr is defined %}
+client_ip_attr={{ server.client_ip_attr }}
+{% endif %}
+{% if server.exempt_usernames is defined %}
+{% for username in server.exempt_usernames %}
+exempt_username_{{ loop.index }}={{ username }}
+{% endfor %}
+{% endif %}
+{% if server.pw_codec is defined %}
+pw_codec={{ server.pw_codec }}
+{% endif %}
+
+{% endfor %}
+{% if duoap_configure_dirsync is defined and duoap_configure_dirsync %}
+[cloud]
+ikey={{ duoap_dirsync_ikey | default(duoap_ikey) }}
+skey={{ duoap_dirsync_skey | default(duoap_skey) }}
+api_host={{ duoap_dirsync_api_host | default(duoap_api_host) }}
+service_account_username={{ duoap_dirsync_service_account_username | default(duoap_service_account_username) }}
+service_account_password={{ duoap_dirsync_service_account_password | default(duoap_service_account_password) }}
+
+{% endif %}
+{% if duoap_configure_sso is defined and duoap_configure_sso %}
+[sso]
+rikey={{ duoap_rikey }}
+service_account_username={{ duoap_sso_service_account_username | default(duoap_service_account_username) }}
+service_account_password={{ duoap_sso_service_account_password | default(duoap_service_account_password) }}
+
+{% endif %}

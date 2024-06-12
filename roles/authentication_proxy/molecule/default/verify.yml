@@ -1,0 +1,35 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  gather_facts: false
+  tasks:
+    - name: Check if DUO authentication proxy is enabled
+      check_mode: true
+      become: true
+      ansible.builtin.systemd_service:
+        name: duoauthproxy.service
+        enabled: true
+      register: _service_enabled
+
+    - name: Assert
+      ansible.builtin.assert:
+        that:
+          - not _service_enabled.changed
+        fail_msg: The DUO authentication proxy is not enabled
+        success_msg: The DUO authentication proxy is enabled
+    
+    - name: Check if DUO authentication proxy is running
+      check_mode: true
+      become: true
+      ansible.builtin.systemd_service:
+        name: duoauthproxy.service
+        state: started
+      register: _service_running
+
+    - name: Assert
+      ansible.builtin.assert:
+        that:
+          - not _service_running.changed
+        fail_msg: The DUO authentication proxy is not running
+        success_msg: The DUO authentication proxy is running

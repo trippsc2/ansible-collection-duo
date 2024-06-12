@@ -1,0 +1,15 @@
+[Unit]
+Description=Duo Security Authentication Proxy
+After=network.target
+
+[Service]
+Type=forking
+ExecStart={{ duoap_base_install_path }}/duoauthproxy/usr/local/bin/python3 -s {{ duoap_base_install_path }}/duoauthproxy/usr/local/bin/twistd --pidfile={{ duoap_base_install_path }}/duoauthproxy/run/duoauthproxy.pid --python={{ duoap_base_install_path }}/duoauthproxy/bin/duoauthproxy.tap --uid={{ _duoap_user_result.uid }} --gid={{ _duoap_group_result.gid }}
+ExecStop={{ duoap_base_install_path }}/duoauthproxy/usr/local/bin/authproxyctl stop
+StandardOutput=journal
+LimitNOFILE=1048576
+Restart=on-failure
+RestartSec=1min
+
+[Install]
+WantedBy=multi-user.target

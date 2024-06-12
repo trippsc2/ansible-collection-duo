@@ -1,0 +1,44 @@
+---
+- name: Install dependencies
+  become: true
+  ansible.builtin.package:
+    name: "{{ _duoap_packages }}"
+    state: present
+
+- name: Install SELinux packages
+  when:
+    - duoap_configure_selinux
+  become: true
+  ansible.builtin.package:
+    name: "{{ _duoap_selinux_packages }}" 
+    state: present
+
+- name: Ensure DUO group exists
+  become: true
+  ansible.builtin.group:
+    name: "{{ duoap_group }}"
+    system: true
+    state: present
+  register: _duoap_group_result
+
+- name: Ensure DUO user exists
+  become: true
+  ansible.builtin.user:
+    name: "{{ duoap_user }}"
+    group: "{{ duoap_group }}"
+    password: '!'
+    password_lock: true
+    shell: /usr/sbin/nologin
+    system: true
+    state: present
+  register: _duoap_user_result
+
+- name: Combine certificates
+  loop: "{{ duoap_combine_certs }}"
+  become: true
+  trippsc2.general.combine_certificates:
+    certificates: "{{ item.files }}"
+    path: "{{ item.path }}"
+    owner: "{{ duoap_user }}"
+    group: "{{ duoap_group }}"
+    mode: '0644'

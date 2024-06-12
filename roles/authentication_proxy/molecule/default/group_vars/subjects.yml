@@ -1,0 +1,22 @@
+---
+duoap_ikey: DIXXXXXXXXXXXXXXXXXX
+duoap_skey: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+duoap_api_host: api-26a75eeb.duosecurity.com
+
+duoap_temp_path: /home/vagrant/duoap
+
+duoap_cert_path: >-
+  {{ '/etc/pki/ca-trust/source/anchors' if ansible_os_family == 'RedHat' else '/usr/share/ca-certificates' }}
+
+duoap_ad_clients:
+  - comment: "Active Directory {{ ad_domain_fqdn }}"
+    hosts:
+      - "dc.{{ ad_domain_fqdn }}"
+    transport: ldaps
+    search_dn: "{{ ad_domain_base_dn }}"
+    ssl_ca_certs_file: "{{ duoap_cert_path }}/winca.pem"
+    port: 636
+
+duoap_configure_dirsync: true
+duoap_service_account_username: "vagrant@{{ ad_domain_fqdn }}"
+duoap_service_account_password: vagrant
