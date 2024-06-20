@@ -26,16 +26,16 @@ argument_specs:
           - The user account as which the DUO Authentication Proxy will run.
       duoap_combine_certs:
         type: list
-        elements: dict
         required: false
         default: []
+        elements: dict
         description:
           - A list of dictionaries specifying the certificates to combine and the path to which they will be written.
         options:
           files:
             type: list
-            elements: path
             required: true
+            elements: path
             description:
               - A list of certificate files to combine.
           path:
@@ -178,9 +178,9 @@ argument_specs:
           - The FQDN of the DUO API server.
       duoap_ad_clients:
         type: list
-        elements: dict
         required: false
         default: []
+        elements: dict
         description:
           - A list of dictionaries specifying Active Directory clients.
         options:
@@ -191,8 +191,8 @@ argument_specs:
               - A comment with which to mark the AD client.
           hosts:
             type: list
-            elements: str
             required: true
+            elements: str
             description:
               - A list of hostnames or IP addresses to which to connect.
           service_account_username:
@@ -204,7 +204,6 @@ argument_specs:
           service_account_password:
             type: str
             required: false
-            no_log: true
             description:
               - The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory.
               - The `duoap_service_account_password` variable will be used if not specified.
@@ -226,11 +225,11 @@ argument_specs:
               - An LDAP filter that the users must match to login.
           transport:
             type: str
+            required: false
             choices:
               - clear
               - ldaps
               - starttls
-            required: false
             description:
               - The transport protocol to use.
           timeout:
@@ -252,10 +251,10 @@ argument_specs:
               - Whether to verify the hostname of the SSL certificate.
           auth_type:
             type: str
+            required: false
             choices:
               - ntlm2
               - plain
-            required: false
             description:
               - The authentication type to use.
               - If not specified, the role will use `ntlm2`.
@@ -293,9 +292,9 @@ argument_specs:
               - If not specified, the role will use `userPrincipalName`.
       duoap_radius_clients:
         type: list
-        elements: dict
         required: false
         default: []
+        elements: dict
         description:
           - A list of dictionaries specifying RADIUS clients.
         options:
@@ -306,20 +305,19 @@ argument_specs:
               - A comment with which to mark the RADIUS client.
           hosts:
             type: list
-            elements: str
             required: true
+            elements: str
             description:
               - A list of hostnames or IP addresses to which to connect.
           secret:
             type: str
             required: true
-            no_log: true
             description:
               - The shared secret to use for authentication.
           ports:
             type: list
-            elements: int
             required: true
+            elements: int
             description:
               - A list of ports on which to connect.
           retries:
@@ -339,8 +337,8 @@ argument_specs:
               - The IP address of the NAS.
           pass_through_attr_names:
             type: list
-            elements: str
             required: false
+            elements: str
             description:
               - A list of attributes to pass through to the RADIUS server.
           pw_codec:
@@ -356,9 +354,9 @@ argument_specs:
           - Whether the DUO Authentication Proxy will only allow DUO authentication.
       duoap_ldap_auto_servers:
         type: list
-        elements: dict
         required: false
         default: []
+        elements: dict
         description:
           - A list of dictionaries specifying LDAP auto servers.
         options:
@@ -390,21 +388,21 @@ argument_specs:
               - The client ID for the DUO Authentication Proxy.
           factors:
             type: list
-            elements: str
+            required: false
             choices:
               - auto
               - push
               - phone
               - passcode
-            required: false
+            elements: str
             description:
               - A list of factors to use for authentication.
           failmode:
             type: str
+            required: false
             choices:
               - safe
               - secure
-            required: false
             description:
               - The failmode to use for authentication.
           port:
@@ -457,8 +455,8 @@ argument_specs:
               - Whether to exempt the primary bind from DUO authentication.
           exempt_ous:
             type: list
-            elements: str
             required: false
+            elements: str
             description:
               - A list of OUs to exempt from DUO authentication.
           delimiter:
@@ -506,9 +504,9 @@ argument_specs:
               - These are in OpenSSL format. https://www.openssl.org/docs/man1.1.1/man1/ciphers.html#CIPHER-LIST-FORMAT
       duoap_radius_auto_servers:
         type: list
-        elements: dict
         required: false
         default: []
+        elements: dict
         description:
           - A list of dictionaries specifying RADIUS auto servers.
         options:
@@ -525,7 +523,6 @@ argument_specs:
           skey:
             type: str
             required: true
-            no_log: true
             description:
               - The secret key for the DUO Authentication Proxy.
           api_host:
@@ -540,8 +537,8 @@ argument_specs:
               - The client ID for the DUO Authentication Proxy.
           radius_clients:
             type: list
-            elements: dict
             required: true
+            elements: dict
             description:
               - A list of RADIUS clients to use.
             options:
@@ -553,18 +550,17 @@ argument_specs:
               secret:
                 type: str
                 required: true
-                no_log: true
                 description:
                   - The shared secret to use for authentication.
           factors:
             type: list
-            elements: str
+            required: false
             choices:
               - auto
               - push
               - phone
               - passcode
-            required: false
+            elements: str
             description:
               - A list of factors to use for authentication.
           delimiter:
@@ -592,10 +588,10 @@ argument_specs:
               - If not specified, there is no timeout.
           failmode:
             type: str
+            required: false
             choices:
               - safe
               - secure
-            required: false
             description:
               - The failmode to use for authentication.
           port:
@@ -610,8 +606,8 @@ argument_specs:
               - The network interface on which to listen for LDAP.
           pass_through_attr_names:
             type: list
-            elements: str
             required: false
+            elements: str
             description:
               - A list of attributes to pass through to the RADIUS server.
           pass_through_all:
@@ -626,8 +622,8 @@ argument_specs:
               - The attribute to use for the client IP address.
           exempt_usernames:
             type: list
-            elements: str
             required: false
+            elements: str
             description:
               - A list of usernames to exempt from DUO authentication.
           pw_codec:
@@ -650,7 +646,6 @@ argument_specs:
       duoap_dirsync_skey:
         type: str
         required: false
-        no_log: true
         description:
           - The secret key for directory synchronization.
           - If not specified, the role will use the `duoap_skey` variable.
@@ -669,7 +664,6 @@ argument_specs:
       duoap_dirsync_service_account_password:
         type: str
         required: false
-        no_log: true
         description:
           - The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory for directory synchronization.
           - If not specified, the role will use the `duoap_service_account_password` variable.
@@ -682,7 +676,6 @@ argument_specs:
       duoap_rikey:
         type: str
         required: false
-        no_log: true
         description:
           - The integration key for SSO.
           - If `duoap_configure_sso` is `true`, this variable is required.
@@ -695,7 +688,6 @@ argument_specs:
       duoap_sso_service_account_password:
         type: str
         required: false
-        no_log: true
         description:
           - The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory for SSO.
           - If not specified, the role will use the `duoap_service_account_password` variable.
