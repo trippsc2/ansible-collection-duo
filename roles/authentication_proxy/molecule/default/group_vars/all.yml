@@ -1,3 +1,0 @@
----
-ad_domain_fqdn: test.local
-ad_domain_base_dn: DC=test,DC=local

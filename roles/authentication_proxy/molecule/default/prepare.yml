@@ -87,6 +87,12 @@
 
     - name: Flush handlers
       ansible.builtin.meta: flush_handlers
+
+    - name: Pre-install DUO Authentication Proxy
+      when:
+        - duoap_upgrade
+      ansible.builtin.include_role:
+        name: trippsc2.duo.authentication_proxy
   handlers:
     - name: Update CA trust
       listen: _update_ca_trust
