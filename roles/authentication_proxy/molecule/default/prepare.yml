@@ -93,6 +93,8 @@
         - duoap_upgrade
       ansible.builtin.include_role:
         name: trippsc2.duo.authentication_proxy
+      vars:
+        duoap_version: '6.2.0'
   handlers:
     - name: Update CA trust
       listen: _update_ca_trust
