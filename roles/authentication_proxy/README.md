@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.duo.authentication_proxy
-Version: 1.0.1
+Version: 1.0.2
 
 This role installs and configures a DUO Authentication Proxy on a Linux machine.
 
@@ -67,8 +67,8 @@ This role installs and configures a DUO Authentication Proxy on a Linux machine.
 | duoap_sso_service_account_password | <p>The password of the service account that the DUO Authentication Proxy will use to authenticate with Active Directory for SSO.</p><p>If not specified, the role will use the `duoap_service_account_password` variable.</p> | str | no |  |  |
 | duoap_logrotate_period | <p>The period for log rotation.</p> | str | no | <ul><li>daily</li><li>weekly</li><li>monthly</li></ul> | daily |
 | duoap_logrotate_retention | <p>The number of log files to retain.</p> | int | no |  | 7 |
-| duoap_configure_firewalld | <p>Whether the role will configure firewalld.</p><p>If Red Hat based or Debian, this will default to `true`.</p> | bool | no |  | true |
-| duoap_configure_ufw | <p>Whether the role will configure ufw.</p><p>If Ubuntu based, this will default to `true`.</p> | bool | no |  | true |
+| duoap_configure_firewalld | <p>Whether the role will configure firewalld.</p><p>For EL or Debian systems, this will default to true.</p><p>For Ubuntu systems, this will default to false.</p> | bool | no |  | true |
+| duoap_configure_ufw | <p>Whether the role will configure ufw.</p><p>For Ubuntu systems, this will default to true.</p><p>For EL or Debian systems, this will default to false.</p> | bool | no |  | true |
 
 ### Options for duoap_combine_certs
 |Option|Description|Type|Required|Choices|Default|

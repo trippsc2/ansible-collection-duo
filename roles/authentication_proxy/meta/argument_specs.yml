@@ -713,11 +713,13 @@ argument_specs:
         default: OS specific
         description:
           - Whether the role will configure firewalld.
-          - If Red Hat based or Debian, this will default to `true`.
+          - For EL or Debian systems, this will default to true.
+          - For Ubuntu systems, this will default to false.
       duoap_configure_ufw:
         type: bool
         required: false
         default: OS specific
         description:
           - Whether the role will configure ufw.
-          - If Ubuntu based, this will default to `true`.
+          - For Ubuntu systems, this will default to true.
+          - For EL or Debian systems, this will default to false.
