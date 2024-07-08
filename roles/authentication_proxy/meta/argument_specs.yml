@@ -15,7 +15,7 @@ argument_specs:
       duoap_group:
         type: str
         required: false
-        default: duo_authproxy_svc
+        default: duo_authproxy_grp
         description:
           - The primary group of the `duoap_user` user under which the DUO Authentication Proxy will run.
       duoap_user:

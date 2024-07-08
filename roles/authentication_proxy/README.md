@@ -25,7 +25,7 @@ This role installs and configures a DUO Authentication Proxy on a Linux machine.
 |Option|Description|Type|Required|Choices|Default|
 |---|---|---|---|---|---|
 | duoap_configure_selinux | <p>Whether the role will configure SELinux for the DUO Authentication Proxy.</p> | bool | no |  | true |
-| duoap_group | <p>The primary group of the `duoap_user` user under which the DUO Authentication Proxy will run.</p> | str | no |  | duo_authproxy_svc |
+| duoap_group | <p>The primary group of the `duoap_user` user under which the DUO Authentication Proxy will run.</p> | str | no |  | duo_authproxy_grp |
 | duoap_user | <p>The user account as which the DUO Authentication Proxy will run.</p> | str | no |  | duo_authproxy_svc |
 | duoap_combine_certs | <p>A list of dictionaries specifying the certificates to combine and the path to which they will be written.</p> | list of dicts of 'duoap_combine_certs' options | no |  |  |
 | duoap_base_install_path | <p>The base path where the DUO Authentication Proxy will be installed.</p><p>The installed version will be placed at `./duoauthproxy-<version>` relative to this path.</p><p>A symlink will be created at `./duoauthproxy` pointing to the most recently installed version.</p> | path | no |  | /opt |
