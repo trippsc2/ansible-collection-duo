@@ -1,4 +1,13 @@
 ---
+- name: Gather OS Facts
+  when:
+    - ansible_os_family is not defined
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!min'
+      - os_family
+
 - name: Validate OS Family is defined
   ansible.builtin.assert:
     that:

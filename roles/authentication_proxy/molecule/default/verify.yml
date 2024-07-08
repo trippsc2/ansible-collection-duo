@@ -12,12 +12,12 @@
         enabled: true
       register: _service_enabled
 
-    - name: Assert
+    - name: Verify DUO authentication proxy is enabled
       ansible.builtin.assert:
         that:
           - not _service_enabled.changed
-        fail_msg: The DUO authentication proxy is not enabled
-        success_msg: The DUO authentication proxy is enabled
+        fail_msg: The DUO authentication proxy is not enabled.
+        success_msg: The DUO authentication proxy is enabled.
     
     - name: Check if DUO authentication proxy is running
       check_mode: true
@@ -27,9 +27,9 @@
         state: started
       register: _service_running
 
-    - name: Assert
+    - name: Verify DUO authentication proxy is running
       ansible.builtin.assert:
         that:
           - not _service_running.changed
-        fail_msg: The DUO authentication proxy is not running
-        success_msg: The DUO authentication proxy is running
+        fail_msg: The DUO authentication proxy is not running.
+        success_msg: The DUO authentication proxy is running.
