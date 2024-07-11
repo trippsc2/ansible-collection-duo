@@ -28,8 +28,6 @@ provisioner:
         ad_domain_fqdn: test.local
         ad_domain_base_dn: DC=test,DC=local
       subjects:
-        duoap_ikey: DIXXXXXXXXXXXXXXXXXX
-        duoap_skey: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
         duoap_api_host: api-26a75eeb.duosecurity.com
         duoap_temp_path: /home/vagrant/duoap
         duoap_cert_path: >-
@@ -42,7 +40,10 @@ provisioner:
             search_dn: "{{ ad_domain_base_dn }}"
             ssl_ca_certs_file: "{{ duoap_cert_path }}/winca.pem"
             port: 636
-        duoap_configure_dirsync: true
+        duoap_dirsync_clouds:
+          - comment: Directory Sync
+            ikey: DIXXXXXXXXXXXXXXXXXX
+            skey: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
         duoap_service_account_username: "vagrant@{{ ad_domain_fqdn }}"
         duoap_service_account_password: vagrant
         duoap_upgrade: ${MOLECULE_DUO_UPGRADE:-false}

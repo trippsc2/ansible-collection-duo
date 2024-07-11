@@ -6,7 +6,7 @@
 - name: Get status of symlink
   become: true
   ansible.builtin.stat:
-    path: "{{ duoap_base_install_path }}/duoauthproxy"
+    path: "{{ duoap_install_path }}"
   register: _duoap_symlink_status
 
 - name: Fail if path is not a symlink or absent
@@ -14,8 +14,8 @@
     that:
       - not _duoap_symlink_status.stat.exists or
         _duoap_symlink_status.stat.islnk
-    fail_msg: "The path {{ duoap_base_install_path }}/duoauthproxy is not a symlink and already exists.  Please resolve this before running this role."
-    success_msg: "The path {{ duoap_base_install_path }}/duoauthproxy is a symlink or does not exist."
+    fail_msg: "The path {{ duoap_install_path }} is not a symlink and already exists.  Please resolve this before running this role."
+    success_msg: "The path {{ duoap_install_path }} is a symlink or does not exist."
 
 - name: If symlink does not exist, signal that install is needed and download DUO tarball
   when:
@@ -62,7 +62,7 @@
     - name: Get active version
       ansible.builtin.set_fact:
         _duoap_active_version: >-
-          {{ _duoap_symlink_status.stat.lnk_target | regex_replace(duoap_base_install_path + '/duoauthproxy-(.*)', '\1') }}
+          {{ _duoap_symlink_status.stat.lnk_target | regex_replace(duoap_install_path + '-(.*)', '\1') }}
 
     - name: Set download version variable
       ansible.builtin.set_fact:

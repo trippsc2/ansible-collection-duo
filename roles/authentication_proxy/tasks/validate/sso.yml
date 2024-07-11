@@ -1,0 +1,7 @@
+---
+- name: Validate SSO remote identity key
+  ansible.builtin.assert:
+    that:
+      - duoap_sso_remote_identity_key is defined
+    fail_msg: "The 'duoap_sso_remote_identity_key' variable must be defined."
+    success_msg: "The 'duoap_sso_remote_identity_key' variable is defined."

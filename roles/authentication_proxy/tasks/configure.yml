@@ -12,7 +12,7 @@
   become: true
   ansible.builtin.template:
     src: authproxy.cfg.j2
-    dest: "{{ duoap_base_install_path }}/duoauthproxy/conf/authproxy.cfg"
+    dest: "{{ duoap_install_path }}/conf/authproxy.cfg"
     owner: "{{ duoap_user }}"
     group: "{{ duoap_group }}"
     mode: '0400'

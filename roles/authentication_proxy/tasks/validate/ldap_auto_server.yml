@@ -1,0 +1,136 @@
+---
+- name: Validate LDAP API host
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.api_host is community.general.fqdn_valid
+    fail_msg: "The 'api_host' variable must be a valid FQDN. Value: {{ _duoap_ldap_auto_server.api_host }}"
+    success_msg: "The 'api_host' variable is valid."
+
+- name: Validate LDAP client ID
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.client | regex_search('^ad_client[0-9*]$')
+    fail_msg: "The 'client' variable must be a valid AD client."
+    success_msg: "The 'client' variable has valid syntax."
+
+- name: Get LDAP AD client number
+  ansible.builtin.set_fact:
+    _duoap_ldap_auto_server_client_number: >-
+      {{ _duoap_ldap_auto_server.client | regex_replace('^ad_client', '') }}
+
+- name: Validate LDAP client
+  when:
+    - _duoap_ldap_auto_server_client_number == ''
+  ansible.builtin.assert:
+    that:
+      - duoap_ad_clients | default([]) | length > 0
+    fail_msg: "The 'client' variable must be a valid AD client."
+    success_msg: "The 'client' variable is valid."
+
+- name: Validate LDAP client
+  when:
+    - _duoap_ldap_auto_server_client_number != ''
+  ansible.builtin.assert:
+    that:
+      - duoap_ad_clients | default([]) | length >= _duoap_ldap_auto_server_client_number | int
+    fail_msg: "The 'client' variable must be a valid AD client."
+    success_msg: "The 'client' variable is valid."
+
+- name: Validate LDAP port
+  when:
+    - _duoap_ldap_auto_server.port is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.port | int >= 0
+      - _duoap_ldap_auto_server.port | int <= 65535
+    fail_msg: "The 'port' variable must be an integer between 0 and 65535. Value: {{ _duoap_ldap_auto_server.port }}"
+    success_msg: "The 'port' variable is valid."
+
+- name: Validate LDAP interface
+  when:
+    - _duoap_ldap_auto_server.interface is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.interface is ansible.utils.ip_address
+    fail_msg: "The 'interface' variable must be a valid IP address. Value: {{ _duoap_ldap_auto_server.interface }}"
+    success_msg: "The 'interface' variable is valid."
+
+- name: Validate LDAP API timeout
+  when:
+    - _duoap_ldap_auto_server.api_timeout is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.api_timeout | int >= 0
+    fail_msg: "The 'api_timeout' variable must be greater than or equal to 0. Value: {{ _duoap_ldap_auto_server.api_timeout }}"
+    success_msg: "The 'api_timeout' variable is valid."
+
+- name: Validate LDAP network timeout
+  when:
+    - _duoap_ldap_auto_server.network_timeout is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.network_timeout | int >= 0
+    fail_msg: "The 'network_timeout' variable must be greater than or equal to 0. Value: {{ _duoap_ldap_auto_server.network_timeout }}"
+    success_msg: "The 'network_timeout' variable is valid."
+
+- name: Validate LDAP idle timeout
+  when:
+    - _duoap_ldap_auto_server.idle_timeout is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.idle_timeout | int >= 0
+    fail_msg: "The 'idle_timeout' variable must be greater than or equal to 0. Value: {{ _duoap_ldap_auto_server.idle_timeout }}"
+    success_msg: "The 'idle_timeout' variable is valid."
+
+- name: Validate LDAP SSL port
+  when:
+    - _duoap_ldap_auto_server.ssl_port is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.ssl_port | int >= 0
+      - _duoap_ldap_auto_server.ssl_port | int <= 65535
+    fail_msg: "The 'ssl_port' variable must be an integer between 0 and 65535. Value: {{ _duoap_ldap_auto_server.ssl_port }}"
+    success_msg: "The 'ssl_port' variable is valid."
+
+- name: Validate LDAP SSL key file
+  when:
+    - _duoap_ldap_auto_server.ssl_key_path is defined
+  block:
+    - name: Check for LDAP SSL key file
+      ansible.builtin.stat:
+        path: "{{ _duoap_ldap_auto_server.ssl_key_path }}"
+      register: _duoap_ssl_key_file
+
+    - name: Validate LDAP SSL key file
+      ansible.builtin.assert:
+        that:
+          - _duoap_ssl_key_file.stat.isreg or
+            _duoap_ssl_key_file.stat.islnk
+        fail_msg: "The 'ssl_key_path' variable must be an existing file. Value: {{ _duoap_ldap_auto_server.ssl_key_path }}"
+        success_msg: "The 'ssl_key_path' variable is valid."
+
+- name: Validate LDAP SSL certificate file
+  when:
+    - _duoap_ldap_auto_server.ssl_cert_path is defined
+  block:
+    - name: Check for LDAP SSL certificate file
+      ansible.builtin.stat:
+        path: "{{ _duoap_ldap_auto_server.ssl_cert_path }}"
+      register: _duoap_ssl_cert_file
+    
+    - name: Validate LDAP SSL certificate file
+      ansible.builtin.assert:
+        that:
+          - _duoap_ssl_cert_file.stat.isreg or
+            _duoap_ssl_cert_file.stat.islnk
+        fail_msg: "The 'ssl_cert_path' variable must be an existing file. Value: {{ _duoap_ldap_auto_server.ssl_cert_path }}"
+        success_msg: "The 'ssl_cert_path' variable is valid."
+
+- name: Validate LDAP password length delimiter
+  when:
+    - _duoap_ldap_auto_server.password_length_delimiter is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ldap_auto_server.password_length_delimiter | int >= 0
+    fail_msg: "The 'password_length_delimiter' variable must be greater than or equal to 0. Value: {{ _duoap_ldap_auto_server.password_length_delimiter }}"
+    success_msg: "The 'password_length_delimiter' variable is valid."

@@ -1,0 +1,122 @@
+---
+- name: Validate RADIUS API host
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_auto_server.api_host is community.general.fqdn_valid
+    fail_msg: "The 'api_host' variable must be a valid FQDN. Value: {{ _duoap_radius_auto_server.api_host }}"
+    success_msg: "The 'api_host' variable is valid."
+
+- name: Validate RADIUS client ID
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_auto_server.client | regex_search('^ad_client[0-9*]$') or
+        _duoap_radius_auto_server.client | regex_search('^radius_client[0-9*]$') or
+        _duoap_radius_auto_server.client | regex_search('^duo_only_client$')
+    fail_msg: "The 'client' variable must be a valid RADIUS client."
+    success_msg: "The 'client' variable has valid syntax."
+
+- name: Get RADIUS client number
+  ansible.builtin.set_fact:
+    _duoap_radius_auto_server_client_number: >-
+      {{ _duoap_radius_auto_server.client |
+          regex_replace('^ad_client', '') |
+          regex_replace('^radius_client', '') |
+          regex_replace('^duo_only_client', '') }}
+
+- name: Validate RADIUS client
+  when:
+    - _duoap_radius_auto_server.client | regex_search('^ad_client[0-9*]$')
+  block:
+    - name: Validate RADIUS client
+      when:
+        - _duoap_radius_auto_server_client_number == ''
+      ansible.builtin.assert:
+        that:
+          - duoap_ad_clients | default([]) | length > 0
+        fail_msg: "The 'client' variable must be a valid AD client."
+        success_msg: "The 'client' variable is valid."
+
+    - name: Validate RADIUS client
+      when:
+        - _duoap_radius_auto_server_client_number != ''
+      ansible.builtin.assert:
+        that:
+          - duoap_ad_clients | default([]) | length >= _duoap_radius_auto_server_client_number | int
+        fail_msg: "The 'client' variable must be a valid AD client."
+        success_msg: "The 'client' variable is valid."
+
+- name: Validate RADIUS client
+  when:
+    - _duoap_radius_auto_server.client | regex_search('^radius_client[0-9*]$')
+  block:
+    - name: Validate RADIUS client
+      when:
+        - _duoap_radius_auto_server_client_number == ''
+      ansible.builtin.assert:
+        that:
+          - duoap_radius_clients | default([]) | length > 0
+        fail_msg: "The 'client' variable must be a valid RADIUS client."
+        success_msg: "The 'client' variable is valid."
+
+    - name: Validate RADIUS client
+      when:
+        - _duoap_radius_auto_server_client_number != ''
+      ansible.builtin.assert:
+        that:
+          - duoap_radius_clients | default([]) | length >= _duoap_radius_auto_server_client_number | int
+        fail_msg: "The 'client' variable must be a valid RADIUS client."
+        success_msg: "The 'client' variable is valid."
+
+- name: Validate RADIUS client
+  when:
+    - _duoap_radius_auto_server.client | regex_search('^duo_only_client$')
+  ansible.builtin.assert:
+    that:
+      - duoap_duo_only_client_enabled | default(false)
+    fail_msg: "The 'client' variable must be a valid RADIUS client."
+    success_msg: "The 'client' variable is valid."
+
+- name: Validate RADIUS client IP
+  loop: "{{ _duoap_radius_auto_server.radius_clients }}"
+  ansible.builtin.assert:
+    that:
+      - item.ip is ansible.utils.ip_address
+    fail_msg: "The 'ip' variable must be a valid IP address. Value: {{ item.ip }}"
+    success_msg: "The 'ip' variable is valid."
+
+- name: Validate RADIUS password length delimiter
+  when:
+    - _duoap_radius_auto_server.password_length_delimiter is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_auto_server.password_length_delimiter | int >= 0
+    fail_msg: "The 'password_length_delimiter' variable must be greater than or equal to 0. Value: {{ _duoap_radius_auto_server.password_length_delimiter }}"
+    success_msg: "The 'password_length_delimiter' variable is valid."
+
+- name: Validate RADIUS API timeout
+  when:
+    - _duoap_radius_auto_server.api_timeout is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_auto_server.api_timeout | int >= 0
+    fail_msg: "The 'api_timeout' variable must be greater than or equal to 0. Value: {{ _duoap_radius_auto_server.api_timeout }}"
+    success_msg: "The 'api_timeout' variable is valid."
+
+- name: Validate RADIUS port
+  when:
+    - _duoap_radius_auto_server.port is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_auto_server.port | int >= 0
+      - _duoap_radius_auto_server.port | int <= 65535
+    fail_msg: "The 'port' variable must be an integer between 0 and 65535. Value: {{ _duoap_radius_auto_server.port }}"
+    success_msg: "The 'port' variable is valid."
+
+- name: Validate RADIUS interface
+  when:
+    - _duoap_radius_auto_server.interface is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_auto_server.interface is ansible.utils.ip_address
+    fail_msg: "The 'interface' variable must be a valid IP address. Value: {{ _duoap_radius_auto_server.interface }}"
+    success_msg: "The 'interface' variable is valid."

@@ -1,0 +1,47 @@
+---
+- name: Validate RADIUS host
+  loop: "{{ _duoap_radius_client.servers }}"
+  ansible.builtin.assert:
+    that:
+      - item.host is community.general.fqdn_valid or
+        item.host is ansible.utils.ip_address
+    fail_msg: "The 'host' variable must be a valid FQDN or IP address. Value: {{ item.host }}"
+    success_msg: "The 'host' variable is valid."
+
+- name: Validate RADIUS port
+  loop: "{{ _duoap_radius_client.servers }}"
+  when:
+    - item.port is defined
+  ansible.builtin.assert:
+    that:
+      - item.port | int >= 0
+      - item.port | int <= 65535
+    fail_msg: "The 'port' variable must be an integer between 0 and 65535. Value: {{ item.port }}"
+    success_msg: "The 'port' variable is valid."
+
+- name: Validate RADIUS retries
+  when:
+    - _duoap_radius_client.retries is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_client.retries | int >= 0
+    fail_msg: "The 'retries' variable must be greater than or equal to 0. Value: {{ _duoap_radius_client.retries }}"
+    success_msg: "The 'retries' variable is valid."
+
+- name: Validate RADIUS retry wait time
+  when:
+    - _duoap_radius_client.retry_wait_time is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_client.retry_wait_time | int >= 1
+    fail_msg: "The 'retry_wait_time' variable must be greater than or equal to 1. Value: {{ _duoap_radius_client.retry_wait_time }}"
+    success_msg: "The 'retry_wait_time' variable is valid."
+
+- name: Validate RADIUS NAS IP
+  when:
+    - _duoap_radius_client.nas_ip is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_radius_client.nas_ip is ansible.utils.ip_address
+    fail_msg: "The 'nas_ip' variable must be a valid IP address. Value: {{ _duoap_radius_client.nas_ip }}"
+    success_msg: "The 'nas_ip' variable is valid."

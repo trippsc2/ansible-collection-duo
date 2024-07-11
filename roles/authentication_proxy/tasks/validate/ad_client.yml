@@ -1,0 +1,46 @@
+---
+- name: Validate LDAP host
+  loop: "{{ _duoap_ad_client.hosts }}"
+  ansible.builtin.assert:
+    that:
+      - item is community.general.fqdn_valid or
+        item is ansible.utils.ip_address
+    fail_msg: "The 'host' variable must be a valid FQDN or IP address. Value: {{ item }}"
+    success_msg: "The 'host' variable is valid."
+
+- name: Validate LDAP timeout
+  when:
+    - _duoap_ad_client.timeout is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ad_client.timeout | int >= 0
+    fail_msg: "The 'timeout' variable must be greater than or equal to 0. Value: {{ _duoap_ad_client.timeout }}"
+    success_msg: "The 'timeout' variable is valid."
+
+- name: Validate LDAP SSL CA certificate file
+  when:
+    - _duoap_ad_client.ssl_ca_certs_file is defined
+  block:
+    - name: Check for LDAP SSL CA certificate file
+      become: true
+      ansible.builtin.stat:
+        path: "{{ _duoap_ad_client.ssl_ca_certs_file }}"
+      register: _duoap_ssl_ca_certs_file
+
+    - name: Validate LDAP SSL CA certificate file
+      ansible.builtin.assert:
+        that:
+          - _duoap_ssl_ca_certs_file.stat.isreg or
+            _duoap_ssl_ca_certs_file.stat.islnk
+        fail_msg: "The 'ssl_ca_certs_file' variable must be an existing file. Value: {{ _duoap_ad_client.ssl_ca_certs_file }}"
+        success_msg: "The 'ssl_ca_certs_file' variable is valid."
+
+- name: Validate LDAP port
+  when:
+    - _duoap_ad_client.port is defined
+  ansible.builtin.assert:
+    that:
+      - _duoap_ad_client.port | int >= 0
+      - _duoap_ad_client.port | int <= 65535
+    fail_msg: "The 'port' variable must be an integer between 0 and 65535. Value: {{ _duoap_ad_client.port }}"
+    success_msg: "The 'port' variable is valid."

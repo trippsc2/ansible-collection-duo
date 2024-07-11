@@ -2,7 +2,6 @@
 - name: Verify
   hosts:
     - subjects
-  gather_facts: false
   tasks:
     - name: Check if DUO authentication proxy is enabled
       check_mode: true
@@ -33,3 +32,318 @@
           - not _service_running.changed
         fail_msg: The DUO authentication proxy is not running.
         success_msg: The DUO authentication proxy is running.
+    
+    - name: Check log directory config
+      check_mode: true
+      become: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: main
+        option: log_dir
+        value: /var/log/duo
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _log_dir
+
+    - name: Verify log directory config
+      ansible.builtin.assert:
+        that:
+          - not _log_dir.changed
+        fail_msg: The log directory is not configured.
+        success_msg: The log directory is configured.
+
+    - name: Check maximum log files config
+      check_mode: true
+      become: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: main
+        option: log_max_files
+        value: "{{ duoap_log_max_files | default(0) }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _log_max_files
+
+    - name: Verify maximum log files config
+      ansible.builtin.assert:
+        that:
+          - not _log_max_files.changed
+        fail_msg: The maximum log files is not configured.
+        success_msg: The maximum log files is configured.
+
+    - name: Check maximum log size config
+      check_mode: true
+      become: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: main
+        option: log_max_size
+        value: "{{ duoap_log_max_size_in_mb | default(0) }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _log_max_size
+
+    - name: Verify maximum log size config
+      ansible.builtin.assert:
+        that:
+          - not _log_max_size.changed
+        fail_msg: The maximum log size is not configured.
+        success_msg: The maximum log size is configured.
+
+    - name: Check AD client host
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: ad_client
+        option: host
+        value: "{{ duoap_ad_clients[0].hosts[0] }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _ad_client_host
+
+    - name: Verify AD client host
+      ansible.builtin.assert:
+        that:
+          - not _ad_client_host.changed
+        fail_msg: The AD client host is not configured.
+        success_msg: The AD client host is configured.
+
+    - name: Check AD client transport
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: ad_client
+        option: transport
+        value: "{{ duoap_ad_clients[0].transport }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _ad_client_transport
+
+    - name: Verify AD client transport
+      ansible.builtin.assert:
+        that:
+          - not _ad_client_transport.changed
+        fail_msg: The AD client transport is not configured.
+        success_msg: The AD client transport is configured.
+
+    - name: Check AD client search DN
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: ad_client
+        option: search_dn
+        value: "{{ duoap_ad_clients[0].search_dn }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _ad_client_search_dn
+
+    - name: Verify AD client search DN
+      ansible.builtin.assert:
+        that:
+          - not _ad_client_search_dn.changed
+        fail_msg: The AD client search DN is not configured.
+        success_msg: The AD client search DN is configured.
+
+    - name: Check AD client username
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: ad_client
+        option: service_account_username
+        value: "{{ duoap_service_account_username }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _ad_client_username
+
+    - name: Verify AD client username
+      ansible.builtin.assert:
+        that:
+          - not _ad_client_username.changed
+        fail_msg: The AD client username is not configured.
+        success_msg: The AD client username is configured.
+
+    - name: Check AD client password
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: ad_client
+        option: service_account_password
+        value: "{{ duoap_service_account_password }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _ad_client_password
+
+    - name: Verify AD client password
+      ansible.builtin.assert:
+        that:
+          - not _ad_client_password.changed
+        fail_msg: The AD client password is not configured.
+        success_msg: The AD client password is configured.
+
+    - name: Check AD client SSL CA certificate file
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: ad_client
+        option: ssl_ca_certs_file
+        value: "{{ duoap_ad_clients[0].ssl_ca_certs_file }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _ad_client_ssl_ca_certs_file
+
+    - name: Verify AD client SSL CA certificate file
+      ansible.builtin.assert:
+        that:
+          - not _ad_client_ssl_ca_certs_file.changed
+        fail_msg: The AD client SSL CA certificate file is not configured.
+        success_msg: The AD client SSL CA certificate file is configured.
+
+    - name: Check AD client port
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: ad_client
+        option: port
+        value: "{{ duoap_ad_clients[0].port }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _ad_client_port
+
+    - name: Verify AD client port
+      ansible.builtin.assert:
+        that:
+          - not _ad_client_port.changed
+        fail_msg: The AD client port is not configured.
+        success_msg: The AD client port is configured.
+
+    - name: Check directory sync integration key
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: cloud
+        option: ikey
+        value: "{{ duoap_dirsync_clouds[0].ikey }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _dirsync_ikey
+
+    - name: Verify directory sync integration key
+      ansible.builtin.assert:
+        that:
+          - not _dirsync_ikey.changed
+        fail_msg: The directory sync integration key is not configured.
+        success_msg: The directory sync integration key is configured.
+
+    - name: Check directory sync secret key
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: cloud
+        option: skey
+        value: "{{ duoap_dirsync_clouds[0].skey }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _dirsync_skey
+
+    - name: Verify directory sync secret key
+      ansible.builtin.assert:
+        that:
+          - not _dirsync_skey.changed
+        fail_msg: The directory sync secret key is not configured.
+        success_msg: The directory sync secret key is configured.
+
+    - name: Check directory sync API hostname
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: cloud
+        option: api_host
+        value: "{{ duoap_api_host }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _dirsync_api_host
+
+    - name: Verify directory sync API hostname
+      ansible.builtin.assert:
+        that:
+          - not _dirsync_api_host.changed
+        fail_msg: The directory sync API hostname is not configured.
+        success_msg: The directory sync API hostname is configured.
+
+    - name: Check directory sync username
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: cloud
+        option: service_account_username
+        value: "{{ duoap_service_account_username }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _dirsync_username
+
+    - name: Verify directory sync username
+      ansible.builtin.assert:
+        that:
+          - not _dirsync_username.changed
+        fail_msg: The directory sync API timeout is not configured.
+        success_msg: The directory sync API timeout is configured.
+
+    - name: Check directory sync password
+      become: true
+      check_mode: true
+      community.general.ini_file:
+        path: /opt/duoauthproxy/conf/authproxy.cfg
+        section: cloud
+        option: service_account_password
+        value: "{{ duoap_service_account_password }}"
+        no_extra_spaces: true
+        owner: duo_authproxy_svc
+        group: duo_authproxy_grp
+        mode: '0400'
+      register: _dirsync_password
+
+    - name: Verify directory sync password
+      ansible.builtin.assert:
+        that:
+          - not _dirsync_password.changed
+        fail_msg: The directory sync password is not configured.
+        success_msg: The directory sync password is configured.

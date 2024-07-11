@@ -32,13 +32,3 @@
     system: true
     state: present
   register: _duoap_user_result
-
-- name: Combine certificates
-  loop: "{{ duoap_combine_certs }}"
-  become: true
-  trippsc2.general.combine_certificates:
-    certificates: "{{ item.files }}"
-    path: "{{ item.path }}"
-    owner: "{{ duoap_user }}"
-    group: "{{ duoap_group }}"
-    mode: '0644'

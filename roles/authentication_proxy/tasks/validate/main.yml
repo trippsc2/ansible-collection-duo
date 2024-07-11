@@ -1,0 +1,152 @@
+---
+- name: Gather OS Facts
+  when:
+    - ansible_os_family is not defined
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!min'
+      - os_family
+
+- name: Validate OS Family is defined
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family is defined
+    fail_msg: OS Family is not defined.
+    success_msg: "OS Family is defined as {{ ansible_os_family }}."
+
+- name: Validate OS Family is supported
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family in _duoap_supported_os_families
+    fail_msg: "OS Family '{{ ansible_os_family }}' is not supported."
+    success_msg: "OS Family '{{ ansible_os_family }}' is supported."
+
+- name: Include OS variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Validate DUO Authentication Proxy version
+  when:
+    - duoap_version is defined
+  ansible.builtin.assert:
+    that:
+      - duoap_version | regex_search('^[0-9]+\\.[0-9]+\\.[0-9]+$')
+    fail_msg: "DUO Authentication Proxy version is not valid. Value: {{ duoap_version }}"
+    success_msg: DUO Authentication Proxy version is valid.
+
+- name: Validate DUO Authentication Proxy API host
+  when:
+    - duoap_api_host is defined
+  ansible.builtin.assert:
+    that:
+      - duoap_api_host is community.general.fqdn_valid
+    fail_msg: "DUO Authentication Proxy API host is not valid. Value: {{ duoap_api_host }}"
+    success_msg: DUO Authentication Proxy API host is valid.
+
+- name: Validate maximum log files
+  when:
+    - duoap_log_max_files is defined
+  ansible.builtin.assert:
+    that:
+      - duoap_log_max_files | int >= 0
+    fail_msg: "The 'duoap_log_max_files' variable must be greater than or equal to 0. Value: {{ duoap_log_max_files }}"
+    success_msg: "The 'duoap_log_max_files' variable is valid."
+
+- name: Validate maximum log file size
+  when:
+    - duoap_log_max_size_in_mb is defined
+  ansible.builtin.assert:
+    that:
+      - duoap_log_max_size_in_mb | int >= 0
+    fail_msg: "The 'duoap_log_max_size_in_mb' variable must be greater than or equal to 0. Value: {{ duoap_log_max_size_in_mb }}"
+    success_msg: "The 'duoap_log_max_size_in_mb' variable is valid."
+
+- name: Check if HTTP CA certificates file
+  ansible.builtin.stat:
+    path: "{{ duoap_http_ca_certs_file }}"
+  register: _duoap_http_ca_certs_file
+
+- name: Validate HTTP CA certificates file
+  ansible.builtin.assert:
+    that:
+      - _duoap_http_ca_certs_file.stat.isreg or
+        _duoap_http_ca_certs_file.stat.islnk
+    fail_msg: "The 'duoap_http_ca_certs_file' variable must be a file. Value: {{ duoap_http_ca_certs_file }}"
+    success_msg: "The 'duoap_http_ca_certs_file' variable is valid."
+
+- name: Validate listening IP address
+  when:
+    - duoap_listen_ip is defined
+  ansible.builtin.assert:
+    that:
+      - duoap_listen_ip is ansible.utils.ip_address
+    fail_msg: "The 'duoap_listen_ip' variable must be a valid IP address. Value: {{ duoap_listen_ip }}"
+    success_msg: "The 'duoap_listen_ip' variable is valid."
+
+- name: Validate HTTP proxy server
+  when:
+    - duoap_http_proxy_server is defined
+  ansible.builtin.assert:
+    that:
+      - duoap_http_proxy_server is community.general.fqdn_valid or
+        duoap_http_proxy_server is ansible.utils.ip_address
+    fail_msg: "The 'duoap_http_proxy_server' variable must be a valid FQDN or IP address. Value: {{ duoap_http_proxy_server }}"
+    success_msg: "The 'duoap_http_proxy_server' variable is valid."
+
+- name: Validate HTTP proxy port
+  when:
+    - duoap_http_proxy_port is defined
+  ansible.builtin.assert:
+    that:
+      - duoap_http_proxy_port | int >= 0
+      - duoap_http_proxy_port | int <= 65535
+    fail_msg: "The 'duoap_http_proxy_port' variable must be an integer between 0 and 65535. Value: {{ duoap_http_proxy_port }}"
+    success_msg: "The 'duoap_http_proxy_port' variable is valid."
+
+- name: Validate AD client
+  loop: "{{ duoap_ad_clients }}"
+  ansible.builtin.include_tasks: ad_client.yml
+  loop_control:
+    loop_var: _duoap_ad_client
+
+- name: Validate RADIUS client
+  loop: "{{ duoap_radius_clients }}"
+  ansible.builtin.include_tasks: radius_client.yml
+  loop_control:
+    loop_var: _duoap_radius_client
+
+- name: Validate LDAP auto server
+  loop: "{{ duoap_ldap_auto_servers }}"
+  ansible.builtin.include_tasks: ldap_auto_server.yml
+  loop_control:
+    loop_var: _duoap_ldap_auto_server
+
+- name: Validate RADIUS auto server
+  loop: "{{ duoap_radius_auto_servers }}"
+  ansible.builtin.include_tasks: radius_auto_server.yml
+  loop_control:
+    loop_var: _duoap_radius_auto_server
+
+- name: Validate directory sync API hostname
+  loop: "{{ duoap_dirsync_clouds }}"
+  when:
+    - item.api_host is defined
+  ansible.builtin.assert:
+    that:
+      - item.api_host is community.general.fqdn_valid
+    fail_msg: "The 'api_host' variable must be a valid FQDN. Value: {{ item.api_host }}"
+    success_msg: "The 'api_host' variable is valid."
+
+- name: Validate SSO
+  when:
+    - duoap_configure_sso
+  ansible.builtin.include_tasks: sso.yml
+
+- name: Validate logrotate retention
+  when:
+    - duoap_configure_logrotate
+  ansible.builtin.assert:
+    that:
+      - duoap_logrotate_retention | int >= 1
+    fail_msg: "The 'duoap_logrotate_retention' variable must be greater than or equal to 1. Value: {{ duoap_logrotate_retention }}"
+    success_msg: "The 'duoap_logrotate_retention' variable is valid."

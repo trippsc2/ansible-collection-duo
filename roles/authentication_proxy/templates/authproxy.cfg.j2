@@ -1,10 +1,10 @@
-{{ ansible_managed | comment }}
+; {{ ansible_managed }}
 
 [main]
+log_dir={{ duoap_log_dir }}
 {% if duoap_debug is defined %}
 debug={{ duoap_debug | ternary('true', 'false') }}
 {% endif %}
-log_dir={{ duoap_log_dir }}
 {% if duoap_log_auth_events is defined %}
 log_auth_events={{ duoap_log_auth_events | ternary('true', 'false') }}
 {% endif %}
@@ -48,7 +48,7 @@ fips_mode={{ duoap_fips_mode | ternary('true', 'false') }}
 
 {% for client in duoap_ad_clients %}
 {% if client.comment is defined %}
-# {{ client.comment }}
+; {{ client.comment }}
 {% endif %}
 {% if loop.first %}
 [ad_client]
@@ -87,11 +87,13 @@ auth_type={{ client.auth_type }}
 {% if client.bind_dn is defined %}
 bind_dn={{ client.bind_dn }}
 {% endif %}
+{% if client.auth_type | default('ntlm2') == 'ntlm2' %}
 {% if client.ntlm_domain is defined %}
 ntlm_domain={{ client.ntlm_domain }}
 {% endif %}
 {% if client.ntlm_workstation is defined %}
 ntlm_workstation={{ client.ntlm_workstation }}
+{% endif %}
 {% endif %}
 {% if client.port is defined %}
 port={{ client.port }}
@@ -106,18 +108,20 @@ at_attribute={{ client.at_attribute }}
 {% endfor %}
 {% for client in duoap_radius_clients %}
 {% if client.comment is defined %}
-# {{ client.comment }}
+; {{ client.comment }}
 {% endif %}
 {% if loop.first %}
 [radius_client]
 {% else %}
 [radius_client{{ loop.index }}]
 {% endif %}
-{% for host in client.hosts %}
+{% for server in client.servers %}
 {% if loop.first %}
-host={{ host }}
+host={{ server.host }}
+port={{ server.port }}
 {% else %}
-host_{{ loop.index }}={{ host }}
+host_{{ loop.index }}={{ server.host }}
+port_{{ loop.index }}={{ server.port }}
 {% endif %}
 {% endfor %}
 secret={{ client.secret }}
@@ -156,7 +160,7 @@ pw_codec={{ client.pw_codec }}
 {% endif %}
 {% for server in duoap_ldap_auto_servers %}
 {% if server.comment is defined %}
-# {{ server.comment }}
+; {{ server.comment }}
 {% endif %}
 {% if loop.first %}
 [ldap_server_auto]
@@ -230,7 +234,7 @@ cipher_list={{ server.cipher_list }}
 {% endfor %}
 {% for server in duoap_radius_auto_servers %}
 {% if server.comment is defined %}
-# {{ server.comment }}
+; {{ server.comment }}
 {% endif %}
 {% if loop.first %}
 [radius_server_auto]
@@ -288,16 +292,23 @@ pw_codec={{ server.pw_codec }}
 {% endif %}
 
 {% endfor %}
-{% if duoap_configure_dirsync is defined and duoap_configure_dirsync %}
-[cloud]
-ikey={{ duoap_dirsync_ikey | default(duoap_ikey) }}
-skey={{ duoap_dirsync_skey | default(duoap_skey) }}
-api_host={{ duoap_dirsync_api_host | default(duoap_api_host) }}
-service_account_username={{ duoap_dirsync_service_account_username | default(duoap_service_account_username) }}
-service_account_password={{ duoap_dirsync_service_account_password | default(duoap_service_account_password) }}
-
+{% for dirsync in duoap_dirsync_clouds %}
+{% if dirsync.comment is defined %}
+; {{ dirsync.comment }}
 {% endif %}
-{% if duoap_configure_sso is defined and duoap_configure_sso %}
+{% if loop.first %}
+[cloud]
+{% else %}
+[cloud{{ loop.index }}]
+{% endif %}
+ikey={{ dirsync.ikey }}
+skey={{ dirsync.skey }}
+api_host={{ dirsync.api_host | default(duoap_api_host) }}
+service_account_username={{ dirsync.service_account_username | default(duoap_service_account_username) }}
+service_account_password={{ dirsync.service_account_password | default(duoap_service_account_password) }}
+
+{% endfor %}
+{% if duoap_configure_sso | default(false) %}
 [sso]
 rikey={{ duoap_rikey }}
 service_account_username={{ duoap_sso_service_account_username | default(duoap_service_account_username) }}
