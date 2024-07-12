@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.duo.authentication_proxy
-Version: 1.0.5
+Version: 1.0.6
 
 This role installs and configures a DUO Authentication Proxy on a Linux machine.
 
@@ -44,7 +44,7 @@ This role installs and configures a DUO Authentication Proxy on a Linux machine.
 | duoap_log_sso_events | <p>Whether DUO Authentication Proxy will log SSO events.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | bool | no |  | false |
 | duoap_log_max_files | <p>The maximum number of log files to keep.</p><p>If set to `0`, all log files will be kept.</p><p>If *duoap_configure_logrotate* is `true`, this will default to `0`.</p><p>Otherwise, this will default to `6`.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | int | no |  |  |
 | duoap_log_max_size_in_mb | <p>The maximum size of each log file in megabytes before the logs will be rotated by the DUO Authentication Proxy.</p><p>If set to `0`, the log files will not be rotated.</p><p>If *duoap_configure_logrotate* is `true`, this will default to `0`.</p><p>Otherwise, this will default to `10`.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | int | no |  | 10 |
-| duoap_http_ca_certs_file | <p>The path to a file containing CA certificates to trust when making HTTP requests.</p><p>For Debian-based systems, this will default to `/usr/local/share/ca-certificates/ca_chain.crt`.</p><p>For EL systems, this will default to `/etc/pki/tls/certs/ca-bundle.crt`.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | path | no |  |  |
+| duoap_http_ca_certs_file | <p>The path to a file containing CA certificates to trust when making HTTP requests.</p><p>For Debian-based systems, this will default to `/etc/ssl/certs/ca-certificates.crt`.</p><p>For EL systems, this will default to `/etc/pki/tls/certs/ca-bundle.crt`.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | path | no |  |  |
 | duoap_interface | <p>The IP address on which the DUO Authentication Proxy will listen.</p><p>If not specified, DUO Authentication Proxy will listen on all interface addresses.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | str | no |  |  |
 | duoap_http_proxy_host | <p>The hostname of the HTTP proxy server.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | str | no |  |  |
 | duoap_http_proxy_port | <p>The port of the HTTP proxy server.</p><p>See: https://duo.com/docs/authproxy-reference#main-section</p> | int | no |  |  |

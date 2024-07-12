@@ -146,7 +146,7 @@ argument_specs:
         required: false
         description:
           - The path to a file containing CA certificates to trust when making HTTP requests.
-          - For Debian-based systems, this will default to `/usr/local/share/ca-certificates/ca_chain.crt`.
+          - For Debian-based systems, this will default to `/etc/ssl/certs/ca-certificates.crt`.
           - For EL systems, this will default to `/etc/pki/tls/certs/ca-bundle.crt`.
           - 'See: https://duo.com/docs/authproxy-reference#main-section'
       duoap_interface:
