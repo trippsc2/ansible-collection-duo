@@ -1,11 +1,13 @@
 ---
 - name: Gather OS Facts
   when:
-    - ansible_os_family is not defined
+    - ansible_os_family is not defined or
+      ansible_distribution is not defined
   ansible.builtin.setup:
     gather_subset:
       - '!all'
       - '!min'
+      - distribution
       - os_family
 
 - name: Validate OS Family is defined
@@ -22,8 +24,22 @@
     fail_msg: "OS Family '{{ ansible_os_family }}' is not supported."
     success_msg: "OS Family '{{ ansible_os_family }}' is supported."
 
+- name: Validate non-EL distribution is supported
+  when:
+    - ansible_os_family != 'RedHat'
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution in _duoap_supported_non_el_distributions
+    fail_msg: "Distribution '{{ ansible_distribution }}' is not supported."
+    success_msg: "Distribution '{{ ansible_distribution }}' is supported."
+
 - name: Include OS variables
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}/main.yml"
+
+- name: Include non-EL distribution variables
+  when:
+    - ansible_os_family != 'RedHat'
+  ansible.builtin.include_vars: "{{ ansible_os_family }}/{{ ansible_distribution }}.yml"
 
 - name: Validate DUO Authentication Proxy version
   when:
@@ -63,15 +79,15 @@
 
 - name: Check if HTTP CA certificates file
   ansible.builtin.stat:
-    path: "{{ duoap_http_ca_certs_file }}"
-  register: _duoap_http_ca_certs_file
+    path: "{{ _duoap_http_ca_certs_file }}"
+  register: _duoap_http_ca_certs_file_info
 
 - name: Validate HTTP CA certificates file
   ansible.builtin.assert:
     that:
-      - _duoap_http_ca_certs_file.stat.isreg or
-        _duoap_http_ca_certs_file.stat.islnk
-    fail_msg: "The 'duoap_http_ca_certs_file' variable must be a file. Value: {{ duoap_http_ca_certs_file }}"
+      - _duoap_http_ca_certs_file_info.stat.isreg or
+        _duoap_http_ca_certs_file_info.stat.islnk
+    fail_msg: "The 'duoap_http_ca_certs_file' variable must be a file. Value: {{ _duoap_http_ca_certs_file }}"
     success_msg: "The 'duoap_http_ca_certs_file' variable is valid."
 
 - name: Validate listening IP address

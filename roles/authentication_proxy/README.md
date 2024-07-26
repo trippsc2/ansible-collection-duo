@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.duo.authentication_proxy
-Version: 1.0.6
+Version: 1.0.7
 
 This role installs and configures a DUO Authentication Proxy on a Linux machine.
 
@@ -26,8 +26,7 @@ This role installs and configures a DUO Authentication Proxy on a Linux machine.
 |---|---|---|---|---|---|
 | duoap_configure_selinux | <p>Whether the role will configure SELinux for the DUO Authentication Proxy.</p> | bool | no |  | true |
 | duoap_configure_logrotate | <p>Whether the role will configure logrotate for the DUO Authentication Proxy.</p> | bool | no |  | true |
-| duoap_configure_firewalld | <p>Whether the role will configure firewalld.</p><p>For EL or Debian systems, this will default to `true`.</p><p>For Ubuntu systems, this will default to `false`.</p> | bool | no |  | false |
-| duoap_configure_ufw | <p>Whether the role will configure ufw.</p><p>For Ubuntu systems, this will default to `true`.</p><p>For EL or Debian systems, this will default to `false`.</p> | bool | no |  | false |
+| duoap_configure_firewall | <p>Whether the role will configure the host firewall for use with DUO Authentication Proxy.</p> | bool | no |  | true |
 | duoap_user | <p>The Linux user as which the DUO Authentication Proxy will run.</p> | str | no |  | duo_authproxy_svc |
 | duoap_group | <p>The Linux primary group of the *duoap_user* user.</p> | str | no |  | duo_authproxy_grp |
 | duoap_install_path | <p>The path of the symlink to the currently installed DUO Authentication Proxy version.</p><p>The installed version will be placed in a folder at path suffixed with `-<version>`.</p> | path | no |  | /opt/duoauthproxy |
@@ -62,6 +61,7 @@ This role installs and configures a DUO Authentication Proxy on a Linux machine.
 | duoap_sso_service_account_password | <p>The password of the *duoap_sso_service_account_username* user account.</p><p>If not specified, this will default to the value of *duoap_service_account_password*.</p><p>See: https://duo.com/docs/authproxy-reference#sso-section</p> | str | no |  |  |
 | duoap_logrotate_period | <p>The period at which the logrotate service will rotate DUO log files.</p><p>If *duoap_configure_logrotate* is `false`, this is ignored.</p> | str | no | <ul><li>daily</li><li>weekly</li><li>monthly</li></ul> | daily |
 | duoap_logrotate_retention | <p>The number of log files for the logrotate service to retain.</p><p>If *duoap_configure_logrotate* is `false`, this is ignored.</p> | int | no |  | 7 |
+| duoap_firewall_type | <p>The type of firewall to configure.</p><p>For Debian or EL systems, this will default to `firewalld`.</p><p>For Ubuntu systems, this will default to `ufw`.</p> | str | no | <ul><li>firewalld</li><li>ufw</li></ul> |  |
 
 ### Options for duoap_ad_clients
 |Option|Description|Type|Required|Choices|Default|

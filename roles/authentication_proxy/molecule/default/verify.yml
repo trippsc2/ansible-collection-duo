@@ -82,7 +82,8 @@
         path: /opt/duoauthproxy/conf/authproxy.cfg
         section: main
         option: log_max_size
-        value: "{{ duoap_log_max_size_in_mb | default(0) }}"
+        value: >-
+          {{ duoap_log_max_size_in_mb | default(0) | int * 1024 * 1024 }}
         no_extra_spaces: true
         owner: duo_authproxy_svc
         group: duo_authproxy_grp

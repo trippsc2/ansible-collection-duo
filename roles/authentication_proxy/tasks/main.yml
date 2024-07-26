@@ -13,10 +13,12 @@
 
 - name: Configure firewalld
   when:
-    - duoap_configure_firewalld
+    - duoap_configure_firewall
+    - _duoap_firewall_type == 'firewalld'
   ansible.builtin.include_tasks: firewalld.yml
 
 - name: Configure ufw
   when:
-    - duoap_configure_ufw
+    - duoap_configure_firewall
+    - _duoap_firewall_type == 'ufw'
   ansible.builtin.include_tasks: ufw.yml

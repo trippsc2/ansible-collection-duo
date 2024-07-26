@@ -29,7 +29,7 @@ log_syslog={{ duoap_log_syslog }}
 syslog_facility={{ duoap_syslog_facility }}
 {% endif %}
 {% endif %}
-http_ca_certs_file={{ duoap_http_ca_certs_file }}
+http_ca_certs_file={{ _duoap_http_ca_certs_file }}
 {% if duoap_interface is defined %}
 interface={{ duoap_interface }}
 {% endif %}
@@ -77,7 +77,7 @@ transport={{ client.transport }}
 {% if client.timeout is defined %}
 timeout={{ client.timeout }}
 {% endif %}
-ssl_ca_certs_file={{ client.ssl_ca_certs_file | default(duoap_http_ca_certs_file) }}
+ssl_ca_certs_file={{ client.ssl_ca_certs_file | default(_duoap_http_ca_certs_file) }}
 {% if client.ssl_verify_hostname is defined %}
 ssl_verify_hostname={{ client.ssl_verify_hostname | ternary('true', 'false') }}
 {% endif %}

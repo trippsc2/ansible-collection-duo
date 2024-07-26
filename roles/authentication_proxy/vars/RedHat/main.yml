@@ -1,7 +1,8 @@
 ---
 _duoap_default_configure_selinux: true
-_duoap_default_configure_firewalld: true
-_duoap_default_configure_ufw: false
+_dupap_default_firewall_type: firewalld
+
+_duoap_default_http_ca_certs_file: /etc/pki/tls/certs/ca-bundle.crt
 
 _duoap_packages:
   - gcc
@@ -16,5 +17,3 @@ _duoap_packages:
 _duoap_selinux_packages:
   - selinux-policy-devel
   - chkconfig
-
-_duoap_default_http_ca_certs_file: /etc/pki/tls/certs/ca-bundle.crt

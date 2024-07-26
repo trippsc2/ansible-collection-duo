@@ -18,20 +18,12 @@ argument_specs:
         default: true
         description:
           - Whether the role will configure logrotate for the DUO Authentication Proxy.
-      duoap_configure_firewalld:
+      duoap_configure_firewall:
         type: bool
         required: false
+        default: true
         description:
-          - Whether the role will configure firewalld.
-          - For EL or Debian systems, this will default to `true`.
-          - For Ubuntu systems, this will default to `false`.
-      duoap_configure_ufw:
-        type: bool
-        required: false
-        description:
-          - Whether the role will configure ufw.
-          - For Ubuntu systems, this will default to `true`.
-          - For EL or Debian systems, this will default to `false`.
+          - Whether the role will configure the host firewall for use with DUO Authentication Proxy.
       duoap_user:
         type: str
         required: false
@@ -821,3 +813,13 @@ argument_specs:
         description:
           - The number of log files for the logrotate service to retain.
           - If *duoap_configure_logrotate* is `false`, this is ignored.
+      duoap_firewall_type:
+        type: str
+        required: false
+        choices:
+          - firewalld
+          - ufw
+        description:
+          - The type of firewall to configure.
+          - For Debian or EL systems, this will default to `firewalld`.
+          - For Ubuntu systems, this will default to `ufw`.
