@@ -12,12 +12,16 @@ platforms:
     box: jtarpley/${MOLECULE_BOX:-rocky8_cis}
     memory: 2048
     cpus: 2
+    provider_options:
+      default_prefix: duo_authentication_proxy_
     groups:
       - subjects
   - name: dc
     box: jtarpley/${MOLECULE_WIN_BOX:-w2022_cis}
     memory: 2048
     cpus: 2
+    provider_options:
+      default_prefix: duo_authentication_proxy_
     groups:
       - windows
 provisioner:
