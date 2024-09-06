@@ -79,6 +79,7 @@ argument_specs:
       duoap_service_account_password:
         type: str
         required: false
+        no_log: true
         description:
           - The password for the *duoap_service_account_username* user account.
       duoap_api_host:
@@ -205,6 +206,7 @@ argument_specs:
           service_account_password:
             type: str
             required: false
+            no_log: true
             description:
               - The password of the *service_account_username* user account.
               - If not specified, this will default to value of *duoap_service_account_password*.
@@ -762,6 +764,7 @@ argument_specs:
           service_account_password:
             type: str
             required: false
+            no_log: true
             description:
               - The password of the *service_account_username* user account.
               - If not specified, this will default to the value of *duoap_service_account_password*.
@@ -791,6 +794,7 @@ argument_specs:
       duoap_sso_service_account_password:
         type: str
         required: false
+        no_log: true
         description:
           - The password of the *duoap_sso_service_account_username* user account.
           - If not specified, this will default to the value of *duoap_service_account_password*.
