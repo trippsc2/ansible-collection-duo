@@ -1,7 +1,7 @@
 ---
 namespace: trippsc2
 name: duo
-version: 1.0.9
+version: 1.0.10
 readme: README.md
 authors:
   - Jim Tarpley
@@ -9,7 +9,11 @@ description: This collection contains modules and roles for configuring Cisco DU
 
 license_file: 'LICENSE'
 
-tags: []
+tags:
+  - application
+  - infrastructure
+  - linux
+  - security
 
 dependencies:
   ansible.posix: ">=1.0.0"

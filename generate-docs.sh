@@ -2,4 +2,4 @@
 
 cd ./roles/authentication_proxy
 
-aar_doc . markdown
+aar-doc . markdown
