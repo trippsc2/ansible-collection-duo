@@ -4,7 +4,7 @@ name: duo
 version: 1.0.10
 readme: README.md
 authors:
-  - Jim Tarpley
+  - Jim Tarpley (@trippsc2)
 description: This collection contains modules and roles for configuring Cisco DUO.
 
 license_file: 'LICENSE'
