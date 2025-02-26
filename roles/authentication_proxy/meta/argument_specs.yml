@@ -4,7 +4,7 @@ argument_specs:
     short_description: DUO Authentication Proxy
     description:
       - This role installs and configures the DUO Authentication Proxy.
-    author: Jim Tarpley
+    author: Jim Tarpley (@trippsc2) (@trippsc2)
     options:
       duoap_configure_selinux:
         type: bool
