@@ -6,7 +6,6 @@
     port: "{{ item.ssl_port | default('636') }}"
     proto: tcp
     rule: allow
-    state: enabled
 
 - name: Configure UFW for RADIUS auto server
   become: true
@@ -15,4 +14,3 @@
     port: "{{ item.port | default('1812') }}"
     proto: udp
     rule: allow
-    state: enabled
