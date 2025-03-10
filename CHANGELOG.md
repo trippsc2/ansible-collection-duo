@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.11] - 2025-03-10
+
+### Role - authentication_proxy
+
+- Fixed Regex typo that caused failed validation.
+
 ## [1.0.10] - 2025-01-08
 
 ### Collection
