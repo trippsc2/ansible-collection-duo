@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2025-03-10
+
+### Role - authentication_proxy
+
+- Fixed variable name of `duoap_rikey` to `duoap_sso_remote_identity_key`.
+- Fixed include/import tasks paths.
+
 ## [1.0.11] - 2025-03-10
 
 ### Role - authentication_proxy

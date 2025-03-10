@@ -121,25 +121,25 @@
 
 - name: Validate AD client
   loop: "{{ duoap_ad_clients }}"
-  ansible.builtin.include_tasks: ad_client.yml
+  ansible.builtin.include_tasks: validate/ad_client.yml
   loop_control:
     loop_var: _duoap_ad_client
 
 - name: Validate RADIUS client
   loop: "{{ duoap_radius_clients }}"
-  ansible.builtin.include_tasks: radius_client.yml
+  ansible.builtin.include_tasks: validate/radius_client.yml
   loop_control:
     loop_var: _duoap_radius_client
 
 - name: Validate LDAP auto server
   loop: "{{ duoap_ldap_auto_servers }}"
-  ansible.builtin.include_tasks: ldap_auto_server.yml
+  ansible.builtin.include_tasks: validate/ldap_auto_server.yml
   loop_control:
     loop_var: _duoap_ldap_auto_server
 
 - name: Validate RADIUS auto server
   loop: "{{ duoap_radius_auto_servers }}"
-  ansible.builtin.include_tasks: radius_auto_server.yml
+  ansible.builtin.include_tasks: validate/radius_auto_server.yml
   loop_control:
     loop_var: _duoap_radius_auto_server
 

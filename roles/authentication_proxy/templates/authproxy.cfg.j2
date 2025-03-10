@@ -310,7 +310,7 @@ service_account_password={{ dirsync.service_account_password | default(duoap_ser
 {% endfor %}
 {% if duoap_configure_sso | default(false) %}
 [sso]
-rikey={{ duoap_rikey }}
+rikey={{ duoap_sso_remote_identity_key }}
 service_account_username={{ duoap_sso_service_account_username | default(duoap_service_account_username) }}
 service_account_password={{ duoap_sso_service_account_password | default(duoap_service_account_password) }}
 

@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.duo.authentication_proxy
-Version: 1.0.11
+Version: 1.0.12
 
 This role installs and configures a DUO Authentication Proxy on a Linux machine.
 
@@ -56,7 +56,7 @@ This role installs and configures a DUO Authentication Proxy on a Linux machine.
 | duoap_radius_auto_servers | <p>A list of RADIUS auto servers.</p><p>See: https://duo.com/docs/authproxy-reference#radius-auto</p> | list of dicts of 'duoap_radius_auto_servers' options | no |  | [] |
 | duoap_dirsync_clouds | <p>Whether the role will configure directory synchronization.</p><p>See: https://duo.com/docs/authproxy-reference#cloud-section</p> | list of dicts of 'duoap_dirsync_clouds' options | no |  | [] |
 | duoap_configure_sso | <p>Whether the role will configure SSO.</p><p>See: https://duo.com/docs/authproxy-reference#sso-section</p> | bool | no |  | False |
-| duoap_rikey | <p>The SSO remote identity key.</p><p>If *duoap_configure_sso* is `false`, this variable is ignored.</p><p>Otherwise, it is required.</p><p>See: https://duo.com/docs/authproxy-reference#sso-section</p> | str | no |  |  |
+| duoap_sso_remote_identity_key | <p>The SSO remote identity key.</p><p>If *duoap_configure_sso* is `false`, this variable is ignored.</p><p>Otherwise, it is required.</p><p>See: https://duo.com/docs/authproxy-reference#sso-section</p> | str | no |  |  |
 | duoap_sso_service_account_username | <p>The service user account that the DUO Authentication Proxy will use to authenticate with Active Directory.</p><p>If not specified, this will default to the value of *duoap_service_account_username*.</p><p>See: https://duo.com/docs/authproxy-reference#sso-section</p> | str | no |  |  |
 | duoap_sso_service_account_password | <p>The password of the *duoap_sso_service_account_username* user account.</p><p>If not specified, this will default to the value of *duoap_service_account_password*.</p><p>See: https://duo.com/docs/authproxy-reference#sso-section</p> | str | no |  |  |
 | duoap_logrotate_period | <p>The period at which the logrotate service will rotate DUO log files.</p><p>If *duoap_configure_logrotate* is `false`, this is ignored.</p> | str | no | <ul><li>daily</li><li>weekly</li><li>monthly</li></ul> | daily |

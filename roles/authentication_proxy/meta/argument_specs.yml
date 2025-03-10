@@ -776,7 +776,7 @@ argument_specs:
         description:
           - Whether the role will configure SSO.
           - 'See: https://duo.com/docs/authproxy-reference#sso-section'
-      duoap_rikey:
+      duoap_sso_remote_identity_key:
         type: str
         required: false
         description:
