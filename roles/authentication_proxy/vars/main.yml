@@ -1,16 +1,8 @@
 ---
-_duoap_supported_os_families:
-  - Debian
-  - RedHat
-
-_duoap_supported_non_el_distributions:
-  - Debian
-  - Ubuntu
-
 _duoap_configure_selinux: >-
   {{ duoap_configure_selinux | default(_duoap_default_configure_selinux) }}
 _duoap_firewall_type: >-
-  {{ duoap_firewall_type | default(_dupap_default_firewall_type) }}
+  {{ duoap_firewall_type | default(_duoap_default_firewall_type) }}
 _duoap_http_ca_certs_file: >-
   {{ duoap_http_ca_certs_file | default(_duoap_default_http_ca_certs_file) }}
 

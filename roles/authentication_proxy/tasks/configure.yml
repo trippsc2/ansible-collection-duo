@@ -19,20 +19,15 @@
   notify:
     - _duoap_restart_duoap
 
-- name: Ensure Duo Authentication Proxy systemd service is enabled
-  become: true
-  ansible.builtin.systemd_service:
-    name: duoauthproxy.service
-    enabled: true
-
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: Ensure Duo Authentication Proxy systemd service is started
+- name: Ensure Duo Authentication Proxy systemd service is started and enabled
   become: true
   ansible.builtin.systemd_service:
     name: duoauthproxy.service
     state: started
+    enabled: true
 
 - name: Configure logrotate
   when:

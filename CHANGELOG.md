@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.13] - 2025-05-15
+
+### Role - authentication_proxy
+
+- Changed OS validation.
+
 ## [1.0.12] - 2025-03-10
 
 ### Role - authentication_proxy
