@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.14] - 2025-06-10
+
+### Collection
+
+- Changed repository URL to use GitHub Organization.
+
 ## [1.0.13] - 2025-05-15
 
 ### Role - authentication_proxy
