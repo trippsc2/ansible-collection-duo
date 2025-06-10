@@ -7,6 +7,10 @@ name: Generate Role Docs
       - main
     paths:
       - galaxy.yml
+      - roles/authentication_proxy/.aar_doc.yml
+      - roles/authentication_proxy/README.md
+      - roles/authentication_proxy/meta/argument_specs.yml
+      - roles/authentication_proxy/meta/main.yml
 defaults:
   run:
     working-directory: 'trippsc2.duo'
