@@ -1,7 +1,7 @@
 ---
 namespace: trippsc2
 name: duo
-version: 1.0.14
+version: 1.0.15
 readme: README.md
 authors:
   - Jim Tarpley (@trippsc2)
@@ -16,9 +16,9 @@ tags:
   - security
 
 dependencies:
-  ansible.posix: ">=1.0.0"
-  community.general: ">=1.0.0"
-  trippsc2.general: ">=1.0.0"
+  ansible.posix: ">=1.0.1"
+  ansible.utils: ">=2.5.0"
+  community.general: ">=8.1.0"
 
 repository: https://github.com/trippsoft/ansible-collection-duo.git
 

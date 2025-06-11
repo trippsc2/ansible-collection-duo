@@ -25,7 +25,7 @@ galaxy_info:
 
 collections:
   - ansible.posix
+  - ansible.utils
   - community.general
-  - trippsc2.general
 
 dependencies: []
