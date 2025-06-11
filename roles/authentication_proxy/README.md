@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.duo.authentication_proxy
-Version: 1.0.14
+Version: 1.0.15
 
 This role installs and configures a DUO Authentication Proxy on a Linux machine.
 
@@ -18,8 +18,8 @@ This role installs and configures a DUO Authentication Proxy on a Linux machine.
 | Collection |
 | ---------- |
 | ansible.posix |
+| ansible.utils |
 | community.general |
-| trippsc2.general |
 
 ## Role Arguments
 |Option|Description|Type|Required|Choices|Default|
